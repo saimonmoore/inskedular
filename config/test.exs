@@ -14,6 +14,15 @@ config :inskedular, Inskedular.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "inskedular_test",
+  database: "inskedular_readstore_test",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox
+
+# Configure the event store database
+config :eventstore, EventStore.Storage,
+  serializer: Commanded.Serialization.JsonSerializer,
+  username: "postgres",
+  password: "postgres",
+  database: "inskedular_eventstore_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox

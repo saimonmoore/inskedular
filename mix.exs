@@ -47,6 +47,7 @@ defmodule Inskedular.Mixfile do
       {:cowboy, "~> 1.0"},
       {:commanded, "~> 0.15"},
       {:commanded_eventstore_adapter, "~> 0.3"},
+      {:ex_machina, "~> 2.1", only: :test},
     ]
   end
 

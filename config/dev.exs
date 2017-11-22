@@ -73,7 +73,7 @@ config :eventstore, EventStore.Storage,
   serializer: Commanded.Serialization.JsonSerializer,
   username: "postgres",
   password: "postgres",
-  database: "conduit_eventstore_dev",
+  database: "inskedular_eventstore_dev",
   hostname: "localhost",
   pool_size: 10
 
