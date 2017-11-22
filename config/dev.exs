@@ -67,3 +67,13 @@ config :inskedular, Inskedular.Repo,
   database: "inskedular_readstore_dev",
   hostname: "localhost",
   pool_size: 10
+
+# Configure the event store database
+config :eventstore, EventStore.Storage,
+  serializer: Commanded.Serialization.JsonSerializer,
+  username: "postgres",
+  password: "postgres",
+  database: "conduit_eventstore_dev",
+  hostname: "localhost",
+  pool_size: 10
+
