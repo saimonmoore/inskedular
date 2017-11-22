@@ -19,8 +19,8 @@ defmodule InskedularWeb.Router do
     get "/", PageController, :index
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", InskedularWeb do
-  #   pipe_through :api
-  # end
+  scope "/api/v1", InskedularWeb do
+    pipe_through :api
+    resources "/schedules", ScheduleController, except: [:new, :edit]
+  end
 end
