@@ -9,4 +9,10 @@ defmodule Inskedular.Scheduling.Commands.CreateSchedule do
   ]
 
   use ExConstructor
+  use Vex.Struct
+
+  validates :schedule_uuid, uuid: true
+  validates :name, presence: [message: "can't be empty"], string: true
+  validates :number_of_games, presence: true, number: true
+  validates :game_duration, presence: true, number: true
 end

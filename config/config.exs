@@ -27,6 +27,14 @@ config :commanded,
 config :commanded_ecto_projections,
   repo: Inskedular.Repo
 
+config :vex,
+  sources: [
+    [string: Inskedular.Support.Validators.String],
+    [number: Inskedular.Support.Validators.Number],
+    [uuid: Inskedular.Support.Validators.Uuid],
+    Vex.Validators
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env}.exs"

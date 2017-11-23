@@ -26,5 +26,12 @@ defmodule Inskedular.SchedulingTest do
       assert schedule.start_date == context[:start_date]
       assert schedule.end_date == context[:end_date]
     end
+
+    @tag :integration
+    test "should fail with invalid data and return error" do
+      assert {:error, :validation_failure, errors} = Scheduling.create_schedule(build(:schedule, name: ""))
+
+      assert errors == %{name: ["can't be empty"]}
+    end
   end
 end

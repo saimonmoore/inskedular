@@ -8,8 +8,8 @@ defmodule Inskedular.Factory do
       name: "Hack Week Tournament",
       number_of_games: 4,
       game_duration: 60,
-      start_date: date_time_for("2017-11-20T14:00:00.000+02:00"),
-      end_date: date_time_for("2017-12-01T14:00:00.000+02:00"),
+      start_date: date_time_for("2017-11-20T14:00:00.000000+02:00"),
+      end_date: date_time_for("2017-12-01T14:00:00.000000+02:00"),
     }
   end
 

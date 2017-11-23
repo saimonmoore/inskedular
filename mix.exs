@@ -51,6 +51,7 @@ defmodule Inskedular.Mixfile do
       {:uuid, "~> 1.1"},
       {:exconstructor, "~> 1.1"},
       {:calendar, "~> 0.17"},
+      {:vex, "~> 0.6"},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
       {:ex_machina, "~> 2.1", only: :test},
     ]
