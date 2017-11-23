@@ -2,15 +2,17 @@ defmodule Inskedular.Repo.Migrations.CreateSchedulingSchedules do
   use Ecto.Migration
 
   def change do
-    create table(:scheduling_schedules) do
+    create table(:scheduling_schedules, primary_key: false) do
+      add :uuid, :uuid, primary_key: true
       add :name, :string
-      add :start_date, :naive_datetime
-      add :end_date, :naive_datetime
+      add :start_date, :timestamptz
+      add :end_date, :timestamptz
       add :number_of_games, :integer
       add :game_duration, :integer
 
-      timestamps()
+      timestamps(type: :timestamptz)
     end
 
+    create unique_index(:scheduling_schedules, [:name])
   end
 end

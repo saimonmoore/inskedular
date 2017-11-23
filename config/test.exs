@@ -9,6 +9,9 @@ config :inskedular, InskedularWeb.Endpoint,
 # Print only warnings and errors during test
 config :logger, level: :warn
 
+config :ex_unit,
+  capture_log: true
+
 # Configure your database
 config :inskedular, Inskedular.Repo,
   adapter: Ecto.Adapters.Postgres,
@@ -16,7 +19,7 @@ config :inskedular, Inskedular.Repo,
   password: "postgres",
   database: "inskedular_readstore_test",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool_size: 1
 
 # Configure the event store database
 config :eventstore, EventStore.Storage,
@@ -25,4 +28,4 @@ config :eventstore, EventStore.Storage,
   password: "postgres",
   database: "inskedular_eventstore_test",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  pool_size: 1

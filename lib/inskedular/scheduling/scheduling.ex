@@ -1,104 +1,37 @@
 defmodule Inskedular.Scheduling do
   @moduledoc """
-  The Scheduling context.
+  The boundary for the Scheduling system.
   """
 
-  import Ecto.Query, warn: false
+  alias Inskedular.Scheduling.Commands.CreateSchedule
+  alias Inskedular.Scheduling.Projections.Schedule
   alias Inskedular.Repo
-
-  alias Inskedular.Scheduling.Schedule
-
-  @doc """
-  Returns the list of schedules.
-
-  ## Examples
-
-      iex> list_schedules()
-      [%Schedule{}, ...]
-
-  """
-  def list_schedules do
-    Repo.all(Schedule)
-  end
+  alias Inskedular.Router
 
   @doc """
-  Gets a single schedule.
-
-  Raises `Ecto.NoResultsError` if the Schedule does not exist.
-
-  ## Examples
-
-      iex> get_schedule!(123)
-      %Schedule{}
-
-      iex> get_schedule!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_schedule!(id), do: Repo.get!(Schedule, id)
-
-  @doc """
-  Creates a schedule.
-
-  ## Examples
-
-      iex> create_schedule(%{field: value})
-      {:ok, %Schedule{}}
-
-      iex> create_schedule(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
+  Create a Schedule
   """
   def create_schedule(attrs \\ %{}) do
-    %Schedule{}
-    |> Schedule.changeset(attrs)
-    |> Repo.insert()
+    uuid = UUID.uuid4()
+
+    create_schedule = 
+      attrs
+      |> assign(:schedule_uuid, uuid)
+      |> CreateSchedule.new()
+
+    with :ok <- Router.dispatch(create_schedule, consistency: :strong) do
+      get(Schedule, uuid)
+    else
+      reply -> reply
+    end
   end
 
-  @doc """
-  Updates a schedule.
-
-  ## Examples
-
-      iex> update_schedule(schedule, %{field: new_value})
-      {:ok, %Schedule{}}
-
-      iex> update_schedule(schedule, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_schedule(%Schedule{} = schedule, attrs) do
-    schedule
-    |> Schedule.changeset(attrs)
-    |> Repo.update()
+  defp get(schema, uuid) do
+    case Repo.get(schema, uuid) do
+      nil -> {:error, :not_found}
+      projection -> {:ok, projection}
+    end
   end
 
-  @doc """
-  Deletes a Schedule.
-
-  ## Examples
-
-      iex> delete_schedule(schedule)
-      {:ok, %Schedule{}}
-
-      iex> delete_schedule(schedule)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_schedule(%Schedule{} = schedule) do
-    Repo.delete(schedule)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking schedule changes.
-
-  ## Examples
-
-      iex> change_schedule(schedule)
-      %Ecto.Changeset{source: %Schedule{}}
-
-  """
-  def change_schedule(%Schedule{} = schedule) do
-    Schedule.changeset(schedule, %{})
-  end
+  defp assign(attrs, key, value), do: Map.put(attrs, key, value)
 end

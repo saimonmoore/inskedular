@@ -14,6 +14,9 @@ defmodule Inskedular.Application do
       supervisor(InskedularWeb.Endpoint, []),
       # Start your own worker by calling: Inskedular.Worker.start_link(arg1, arg2, arg3)
       # worker(Inskedular.Worker, [arg1, arg2, arg3]),
+
+      # Scheduling supervisor
+      supervisor(Inskedular.Scheduling.Supervisor, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

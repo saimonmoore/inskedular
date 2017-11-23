@@ -5,11 +5,11 @@ defmodule Inskedular.Scheduling.Schedule do
 
 
   schema "scheduling_schedules" do
-    field :end_date, :naive_datetime
     field :game_duration, :integer
     field :name, :string
     field :number_of_games, :integer
     field :start_date, :naive_datetime
+    field :end_date, :naive_datetime
 
     timestamps()
   end

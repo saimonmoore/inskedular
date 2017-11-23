@@ -15,8 +15,8 @@ defmodule Inskedular.Scheduling.Aggregates.ScheduleTest do
           name: "Hack Week Tournament",
           number_of_games: 4,
           game_duration: 60,
-          start_date: ~N[2017-11-20 14:00:00.000000],
-          end_date: ~N[2017-12-01 14:00:00.000000],
+          start_date: DateTime.from_iso8601("2017-11-20T14:00:00.000+02:00"),
+          end_date: DateTime.from_iso8601("2017-12-01T14:00:00.000+02:00"),
         }
       ]
     end

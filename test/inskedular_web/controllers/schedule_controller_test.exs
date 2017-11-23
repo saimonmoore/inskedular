@@ -21,11 +21,11 @@ defmodule InskedularWeb.ScheduleControllerTest do
       json = json_response(conn, 201)["data"]
 
       assert json == %{
-        "game_duration" => 60,
-        "name" => "Hack Week Tournament",
+        "game_duration"   => 60,
+        "name"            => "Hack Week Tournament",
         "number_of_games" => 4,
-        "start_date" => ~N[2017-11-20 14:00:00.000000],
-        "end_date" => ~N[2017-12-01 14:00:00.000000]
+        "start_date"      => DateTime.from_iso8601("2017-11-20T14:00:00.000+02:00"),
+        "end_date"        => DateTime.from_iso8601("2017-12-01T14:00:00.000+02:00"),
       }
     end
 
