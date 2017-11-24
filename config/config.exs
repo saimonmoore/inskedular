@@ -29,9 +29,8 @@ config :commanded_ecto_projections,
 
 config :vex,
   sources: [
-    [string: Inskedular.Support.Validators.String],
-    [number: Inskedular.Support.Validators.Number],
-    [uuid: Inskedular.Support.Validators.Uuid],
+    Inskedular.Support.Validators,
+    Inskedular.Scheduling.Validators,
     Vex.Validators
   ]
 

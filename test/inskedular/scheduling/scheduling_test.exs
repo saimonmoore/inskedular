@@ -17,7 +17,7 @@ defmodule Inskedular.SchedulingTest do
 
   describe "create schedule" do
     @tag :integration
-    test "should succeed with valid data", context do
+    test "succeeds with valid data", context do
       assert {:ok, %Schedule{} = schedule} = Scheduling.create_schedule(build(:schedule))
 
       assert schedule.name == "Hack Week Tournament"
@@ -28,10 +28,18 @@ defmodule Inskedular.SchedulingTest do
     end
 
     @tag :integration
-    test "should fail with invalid data and return error" do
+    test "fails with invalid data and return error" do
       assert {:error, :validation_failure, errors} = Scheduling.create_schedule(build(:schedule, name: ""))
 
       assert errors == %{name: ["can't be empty"]}
+    end
+
+    @tag :integration
+    test "fails when name already taken and return error" do
+      assert {:ok, %Schedule{}} = Scheduling.create_schedule(build(:schedule))
+      assert {:error, :validation_failure, errors} = Scheduling.create_schedule(build(:schedule))
+
+      assert errors == %{name: ["has already been taken"]}
     end
   end
 end

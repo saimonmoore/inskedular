@@ -5,8 +5,8 @@ defmodule Inskedular.Scheduling do
 
   alias Inskedular.Scheduling.Commands.CreateSchedule
   alias Inskedular.Scheduling.Projections.Schedule
-  alias Inskedular.Repo
-  alias Inskedular.Router
+  alias Inskedular.Scheduling.Queries.ScheduleByName
+  alias Inskedular.{Repo,Router}
 
   @doc """
   Create a Schedule
@@ -24,6 +24,16 @@ defmodule Inskedular.Scheduling do
     else
       reply -> reply
     end
+  end
+
+
+  @doc """
+  Get an existing schedule by the name, or return `nil` if not present
+  """
+  def schedule_by_name(name) when is_binary(name) do
+    name
+    |> ScheduleByName.new()
+    |> Repo.one()
   end
 
   defp get(schema, uuid) do

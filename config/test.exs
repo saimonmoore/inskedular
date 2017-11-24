@@ -7,7 +7,7 @@ config :inskedular, InskedularWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :debug
 
 config :ex_unit,
   capture_log: true
