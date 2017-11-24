@@ -11,10 +11,9 @@ defmodule InskedularWeb.ScheduleView do
   end
 
   def render("schedule.json", %{schedule: schedule}) do
-    %{id: schedule.id,
-      name: schedule.name,
-      start_date: schedule.start_date,
-      end_date: schedule.end_date,
+    %{name: schedule.name,
+      start_date: DateTime.to_iso8601(schedule.start_date),
+      end_date:  DateTime.to_iso8601(schedule.end_date),
       number_of_games: schedule.number_of_games,
       game_duration: schedule.game_duration}
   end

@@ -6,10 +6,10 @@ defmodule InskedularWeb.FallbackController do
   """
   use InskedularWeb, :controller
 
-  def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
+  def call(conn, {:error, :validation_failure, errors}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> render(InskedularWeb.ChangesetView, "error.json", changeset: changeset)
+    |> render(InskedularWeb.ValidationView, "error.json", errors: errors)
   end
 
   def call(conn, {:error, :not_found}) do

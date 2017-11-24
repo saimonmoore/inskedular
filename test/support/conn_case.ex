@@ -28,11 +28,8 @@ defmodule InskedularWeb.ConnCase do
 
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Inskedular.Repo)
-    unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Inskedular.Repo, {:shared, self()})
-    end
+    Inskedular.Storage.reset!()
+
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
-
 end

@@ -41,5 +41,12 @@ defmodule Inskedular.SchedulingTest do
 
       assert errors == %{name: ["has already been taken"]}
     end
+
+    @tag :integration
+    test "fails when creating schedules with identical names concurrently and returns error" do
+      1..2
+      |> Enum.map(fn _ -> Task.async(fn -> Scheduling.create_schedule(build(:schedule)) end) end)
+      |> Enum.map(&Task.await/1)
+    end
   end
 end

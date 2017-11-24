@@ -11,7 +11,7 @@ defmodule InskedularWeb.ScheduleControllerTest do
   end
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    {:ok, conn: put_req_header(conn, "accept", "application/json") }
   end
 
   describe "create schedule" do
@@ -24,15 +24,15 @@ defmodule InskedularWeb.ScheduleControllerTest do
         "game_duration"   => 60,
         "name"            => "Hack Week Tournament",
         "number_of_games" => 4,
-        "start_date"      => DateTime.from_iso8601("2017-11-20T14:00:00.000+02:00"),
-        "end_date"        => DateTime.from_iso8601("2017-12-01T14:00:00.000+02:00"),
+        "start_date"      => "2017-11-20T12:00:00.000000Z",
+        "end_date"        => "2017-12-01T12:00:00.000000Z",
       }
     end
 
     @tag :web
     test "does not create schedule and renders errors when data is invalid", %{conn: conn} do
       conn = post conn, schedule_path(conn, :create), schedule: build(:schedule, name: "")
-      assert json_response(conn, 422)["errors"] != %{
+      assert json_response(conn, 422)["errors"] == %{
         "name" => [
           "can't be empty",
         ]
@@ -44,7 +44,7 @@ defmodule InskedularWeb.ScheduleControllerTest do
       {:ok, _schedule} = fixture(:schedule)
 
       conn = post conn, schedule_path(conn, :create), schedule: build(:schedule, name: "Hack Week Tournament")
-      assert json_response(conn, 422)["errors"] != %{
+      assert json_response(conn, 422)["errors"] == %{
         "name" => [
           "has already been taken",
         ]
