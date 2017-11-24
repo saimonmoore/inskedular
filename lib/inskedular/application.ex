@@ -17,6 +17,7 @@ defmodule Inskedular.Application do
 
       # Scheduling supervisor
       supervisor(Inskedular.Scheduling.Supervisor, []),
+      worker(Inskedular.Support.Unique, []),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
