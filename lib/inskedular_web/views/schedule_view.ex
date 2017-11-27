@@ -1,6 +1,6 @@
 defmodule InskedularWeb.ScheduleView do
   use InskedularWeb, :view
-  use Inskedular.Support.Casting
+  use Inskedular.Support.Presenting
 
   alias InskedularWeb.ScheduleView
 
@@ -13,8 +13,9 @@ defmodule InskedularWeb.ScheduleView do
   end
 
   def render("schedule.json", %{schedule: schedule}) do
-    {:ok, start_date} = cast_datetime(schedule.start_date)
-    {:ok, end_date} = cast_datetime(schedule.end_date)
+    start_date = present_datetime(schedule.start_date)
+    end_date = present_datetime(schedule.end_date)
+
     %{uuid: schedule.uuid,
       name: schedule.name,
       start_date: start_date,

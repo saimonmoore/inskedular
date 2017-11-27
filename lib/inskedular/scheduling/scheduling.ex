@@ -3,6 +3,8 @@ defmodule Inskedular.Scheduling do
   The boundary for the Scheduling system.
   """
 
+  use Inskedular.Support.Casting
+
   alias Inskedular.Scheduling.Commands.CreateSchedule
   alias Inskedular.Scheduling.Projections.Schedule
   alias Inskedular.Scheduling.Queries.ScheduleByName
@@ -46,7 +48,21 @@ defmodule Inskedular.Scheduling do
 
   defp assign(attrs, key, value), do: Map.put(attrs, key, value)
 
-  defp cast_attributes(%{"game_duration" => game_duration, "number_of_games" => number_of_games} = attrs) do
-    %{attrs | "number_of_games" => String.to_integer(number_of_games), "game_duration" => String.to_integer(game_duration)}
+  defp cast_attributes(%{
+    "game_duration" => game_duration,
+    "number_of_games" => number_of_games,
+    "start_date" => start_date_string,
+    "end_date" => end_date_string,
+  } = attrs) do
+
+    {:ok, start_date} = cast_datetime(start_date_string)
+    {:ok, end_date} = cast_datetime(end_date_string)
+
+    %{attrs |
+      "number_of_games" => String.to_integer(number_of_games),
+      "game_duration" => String.to_integer(game_duration),
+      "start_date" => start_date,
+      "end_date" => end_date,
+    }
   end
 end
