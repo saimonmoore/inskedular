@@ -1,26 +1,46 @@
+/* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
+
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
 
 class ScheduleForm extends Component {
   constructor(props) {
     super(props)
-    this.state = { form: {}, value: '' }
+    this.state = {
+      form: {},
+      name: '',
+      numberOfGames: 4,
+      gameDuration: 60,
+    }
 
-    this.handleChange = this.handleChange.bind(this)
+    this.handleChangeName = this.handleChangeName.bind(this)
+    this.handleChangeNumberOfGames = this.handleChangeNumberOfGames.bind(this)
+    this.handleChangeGameDuration = this.handleChangeGameDuration.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.createSchedule = this.createSchedule.bind(this)
   }
 
-  handleChange(event) {
-    this.setState({ value: event.target.value })
+  handleChangeName(event) {
+    this.setState({ name: event.target.value })
+  }
+
+  handleChangeNumberOfGames(event) {
+    this.setState({ numberOfGames: event.target.value })
+  }
+
+  handleChangeGameDuration(event) {
+    this.setState({ gameDuration: event.target.value })
   }
 
   createSchedule() {
-    const { name } = this.state.form
+    const { name, numberOfGames, gameDuration } = this.state.form
     const headers = new Headers()
     headers.set('Accept', 'application/json')
+    headers.set('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
 
-    const body = new FormData()
-    body.append('name', name)
+    const body = new URLSearchParams()
+    body.append('schedule[name]', name)
+    body.append('schedule[number_of_games]', numberOfGames)
+    body.append('schedule[game_duration]', gameDuration)
 
     const conf = {
       method: 'POST',
@@ -30,7 +50,7 @@ class ScheduleForm extends Component {
       body,
     }
 
-    fetch('/api/v1/schedule', conf).then(response => {
+    fetch('/api/v1/schedules', conf).then(response => {
       if (response.ok) {
         return response.json()
       }
@@ -44,12 +64,22 @@ class ScheduleForm extends Component {
 
   handleSubmit(event) {
     const { target } = event
-    const input = target.querySelector('input[type=text]')
-    const name = this.state.value
-    this.setState({ form: { name } }, () => {
+    const nodes = target.querySelectorAll('input#schedule_name, input#schedule_number_of_games, input#schedule_game_duration')
+
+    const [name, numberOfGames, gameDuration] = nodes
+    const data = {
+      form: {
+        name: name.value,
+        numberOfGames: numberOfGames.value,
+        gameDuration: gameDuration.value,
+      },
+    }
+    this.setState(data, () => {
       console.log(`The form was submitted: ${this.state.form.name}`)
       this.createSchedule()
-      input.value = ''
+      nodes.forEach(node => {
+        node.value = ''
+      })
     })
     event.preventDefault()
   }
@@ -59,8 +89,29 @@ class ScheduleForm extends Component {
       <form onSubmit={ this.handleSubmit }>
         <label>
           Name:
-          <input type="text" value={ this.state.value } onChange={ this.handleChange } />
+          <input
+            id='schedule_name'
+            type="text"
+            value={ this.state.name }
+            onChange={ this.handleChangeName } />
         </label>
+        <label>
+          Number of games per week:
+          <input
+            id='schedule_number_of_games'
+            type="text"
+            value={ this.state.numberOfGames }
+            onChange={ this.handleChangeNumberOfGames } />
+        </label>
+        <label>
+          Duration of each game (seconds):
+          <input
+            id='schedule_game_duration'
+            type="text"
+            value={ this.state.gameDuration }
+            onChange={ this.handleChangeGameDuration } />
+        </label>
+
         <input type="submit" value="Create" />
       </form>
     )
