@@ -16,6 +16,7 @@ defmodule Inskedular.Scheduling do
 
     create_schedule = 
       attrs
+      |> cast_attributes
       |> assign(:schedule_uuid, uuid)
       |> CreateSchedule.new()
 
@@ -44,4 +45,8 @@ defmodule Inskedular.Scheduling do
   end
 
   defp assign(attrs, key, value), do: Map.put(attrs, key, value)
+
+  defp cast_attributes(%{"game_duration" => game_duration, "number_of_games" => number_of_games} = attrs) do
+    %{attrs | "number_of_games" => String.to_integer(number_of_games), "game_duration" => String.to_integer(game_duration)}
+  end
 end
