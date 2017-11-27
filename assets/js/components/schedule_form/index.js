@@ -1,6 +1,7 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
+import moment from 'moment'
 
 class ScheduleForm extends Component {
   constructor(props) {
@@ -10,11 +11,15 @@ class ScheduleForm extends Component {
       name: '',
       numberOfGames: 4,
       gameDuration: 60,
+      startDate: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
+      endDate: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
     }
 
     this.handleChangeName = this.handleChangeName.bind(this)
     this.handleChangeNumberOfGames = this.handleChangeNumberOfGames.bind(this)
     this.handleChangeGameDuration = this.handleChangeGameDuration.bind(this)
+    this.handleChangeStartDate = this.handleChangeStartDate.bind(this)
+    this.handleChangeEndDate = this.handleChangeStartDate.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.createSchedule = this.createSchedule.bind(this)
   }
@@ -31,8 +36,22 @@ class ScheduleForm extends Component {
     this.setState({ gameDuration: event.target.value })
   }
 
+  handleChangeStartDate(event) {
+    this.setState({ startDate: event.target.value })
+  }
+
+  handleChangeEndDate(event) {
+    this.setState({ endDate: event.target.value })
+  }
+
   createSchedule() {
-    const { name, numberOfGames, gameDuration } = this.state.form
+    const {
+      name,
+      numberOfGames,
+      gameDuration,
+      startDate,
+      endDate,
+    } = this.state.form
     const headers = new Headers()
     headers.set('Accept', 'application/json')
     headers.set('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
@@ -41,6 +60,8 @@ class ScheduleForm extends Component {
     body.append('schedule[name]', name)
     body.append('schedule[number_of_games]', numberOfGames)
     body.append('schedule[game_duration]', gameDuration)
+    body.append('schedule[start_date]', startDate)
+    body.append('schedule[end_date]', endDate)
 
     const conf = {
       method: 'POST',
@@ -64,14 +85,26 @@ class ScheduleForm extends Component {
 
   handleSubmit(event) {
     const { target } = event
-    const nodes = target.querySelectorAll('input#schedule_name, input#schedule_number_of_games, input#schedule_game_duration')
+    const nodes = target.querySelectorAll(`input#schedule_name,
+                                           input#schedule_start_date,
+                                           input#schedule_end_date,
+                                           input#schedule_number_of_games,
+                                           input#schedule_game_duration`)
 
-    const [name, numberOfGames, gameDuration] = nodes
+    const [
+      name,
+      startDate,
+      endDate,
+      numberOfGames,
+      gameDuration,
+    ] = nodes
     const data = {
       form: {
         name: name.value,
         numberOfGames: numberOfGames.value,
         gameDuration: gameDuration.value,
+        startDate: startDate.value,
+        endDate: endDate.value,
       },
     }
     this.setState(data, () => {
@@ -94,6 +127,22 @@ class ScheduleForm extends Component {
             type="text"
             value={ this.state.name }
             onChange={ this.handleChangeName } />
+        </label>
+        <label>
+          Starting on:
+          <input
+            id='schedule_start_date'
+            type="text"
+            value={ this.state.startDate }
+            onChange={ this.handleChangeStartDate } />
+        </label>
+        <label>
+          Ending on:
+          <input
+            id='schedule_end_date'
+            type="text"
+            value={ this.state.endDate }
+            onChange={ this.handleChangeEndDate } />
         </label>
         <label>
           Number of games per week:
