@@ -7,7 +7,7 @@ defmodule InskedularWeb.ScheduleControllerTest do
   alias Inskedular.Scheduling.Schedule
 
   def fixture(:schedule, attrs \\ []) do
-    build(:schedule, attrs) |> Scheduling.create_schedule()
+    build_schedule_params(attrs) |> Scheduling.create_schedule()
   end
 
   setup %{conn: conn} do
@@ -17,21 +17,21 @@ defmodule InskedularWeb.ScheduleControllerTest do
   describe "create schedule" do
     @tag :web
     test "creates and renders schedule when data is valid", %{conn: conn} do
-      conn = post conn, schedule_path(conn, :create), schedule: build(:schedule)
+      conn = post conn, schedule_path(conn, :create), build_schedule_params
       json = json_response(conn, 201)["data"]
 
-      assert json == %{
+      assert Map.delete(json, "uuid") == %{
         "game_duration"   => 60,
         "name"            => "Hack Week Tournament",
         "number_of_games" => 4,
-        "start_date"      => "2017-11-20T12:00:00.000000Z",
-        "end_date"        => "2017-12-01T12:00:00.000000Z",
+        "start_date"      => "20-11-2017 12:00:00",
+        "end_date"        => "01-12-2017 12:00:00",
       }
     end
 
     @tag :web
     test "does not create schedule and renders errors when data is invalid", %{conn: conn} do
-      conn = post conn, schedule_path(conn, :create), schedule: build(:schedule, name: "")
+      conn = post conn, schedule_path(conn, :create), build_schedule_params(name: "")
       assert json_response(conn, 422)["errors"] == %{
         "name" => [
           "can't be empty",
@@ -43,7 +43,7 @@ defmodule InskedularWeb.ScheduleControllerTest do
     test "does not create schedule and renders errors when name is taken", %{conn: conn} do
       {:ok, _schedule} = fixture(:schedule)
 
-      conn = post conn, schedule_path(conn, :create), schedule: build(:schedule, name: "Hack Week Tournament")
+      conn = post conn, schedule_path(conn, :create), build_schedule_params(name: "Hack Week Tournament")
       assert json_response(conn, 422)["errors"] == %{
         "name" => [
           "has already been taken",
