@@ -1,13 +1,17 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
+import { Redirect } from 'react-router-dom'
+import { observer } from 'mobx-react'
 import moment from 'moment'
+import schedules from '../../stores/schedules'
 
 class ScheduleForm extends Component {
   constructor(props) {
     super(props)
     this.state = {
       form: {},
+      submitted: false,
       name: '',
       numberOfGames: 4,
       gameDuration: 60,
@@ -52,44 +56,42 @@ class ScheduleForm extends Component {
       startDate,
       endDate,
     } = this.state.form
-    const headers = new Headers()
-    headers.set('Accept', 'application/json')
-    headers.set('Content-Type', 'application/x-www-form-urlencoded; charset=utf-8')
 
-    const body = new URLSearchParams()
-    body.append('schedule[name]', name)
-    body.append('schedule[number_of_games]', numberOfGames)
-    body.append('schedule[game_duration]', gameDuration)
-    body.append('schedule[start_date]', startDate)
-    body.append('schedule[end_date]', endDate)
+    return schedules.create({
+      name,
+      number_of_games: numberOfGames,
+      game_duration: gameDuration,
+      start_date: startDate,
+      end_date: endDate,
+    }, { optimistic: false })
+  }
 
-    const conf = {
-      method: 'POST',
-      mode: 'cors',
-      cache: 'default',
-      headers,
-      body,
-    }
-
-    fetch('/api/v1/schedules', conf).then(response => {
-      if (response.ok) {
-        return response.json()
-      }
-      throw new Error('Network response was not ok.')
-    }).then(json => {
-      console.log(`Got JSON: ${json}`)
+  creatingSchedule() {
+    const promise = this.createSchedule()
+    promise.then(json => {
+      this.setState({ submitted: true, schedule_uuid: json.data.uuid })
     }).catch(error => {
-      console.log(`There has been a problem with your fetch operation: ${error.message}`)
+      console.error(`There has been a problem with your fetch operation: ${error.message}`)
+    })
+  }
+
+  inputNodes() {
+    return document.querySelectorAll(`input#schedule_name,
+                                    input#schedule_start_date,
+                                    input#schedule_end_date,
+                                    input#schedule_number_of_games,
+                                    input#schedule_game_duration`)
+  }
+
+  resetForm() {
+    const nodes = this.inputNodes()
+    nodes.forEach(node => {
+      node.value = ''
     })
   }
 
   handleSubmit(event) {
-    const { target } = event
-    const nodes = target.querySelectorAll(`input#schedule_name,
-                                           input#schedule_start_date,
-                                           input#schedule_end_date,
-                                           input#schedule_number_of_games,
-                                           input#schedule_game_duration`)
+    const nodes = this.inputNodes()
 
     const [
       name,
@@ -108,16 +110,21 @@ class ScheduleForm extends Component {
       },
     }
     this.setState(data, () => {
-      console.log(`The form was submitted: ${this.state.form.name}`)
-      this.createSchedule()
-      nodes.forEach(node => {
-        node.value = ''
-      })
+      this.creatingSchedule()
+      this.resetForm()
     })
     event.preventDefault()
   }
 
   render() {
+    const { submitted, schedule_uuid } = this.state
+    if (submitted) {
+      return <Redirect to={{
+                             pathname: '/add_teams',
+                             state: { schedule_uuid },
+                           }}/>
+    }
+
     return (
       <form onSubmit={ this.handleSubmit }>
         <label>
@@ -167,4 +174,4 @@ class ScheduleForm extends Component {
   }
 }
 
-export default ScheduleForm
+export default observer(ScheduleForm)
