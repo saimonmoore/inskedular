@@ -9,6 +9,7 @@
   "rules": {
     "comma-dangle": ["error", "always-multiline"],
     "space-before-function-paren": ["error", "never"],
+    "class-methods-use-this": "off",
     "no-extra-semi": "error",
     "object-curly-spacing": [
       "error",
