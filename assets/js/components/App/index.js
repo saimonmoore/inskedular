@@ -13,6 +13,8 @@ import adapter from 'mobx-rest-fetch-adapter'
 import ScheduleForm from '../schedule_form'
 import AddTeams from '../add_teams'
 
+import DevTools from 'mobx-react-devtools'
+
 // Initialize mob-rest API adapter
 apiClient(adapter, {
   commonOptions: {
@@ -62,6 +64,7 @@ const App = () => (
         <Route path="/new_schedule" component={ NewSchedule }/>
         <Route path="/add_teams" component={ AddTeamsPage }/>
       </Switch>
+      <DevTools />
     </div>
   </Router>
 )

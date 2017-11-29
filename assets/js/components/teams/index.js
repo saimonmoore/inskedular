@@ -31,7 +31,7 @@ class Teams extends Component {
             <Team key={ team.id } team={ team } />
           ))
         }
-        <TeamForm collection={ teams } />
+        <TeamForm teams={ teams } />
       </div>
     )
   }
