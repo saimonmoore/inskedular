@@ -60,4 +60,66 @@ defmodule Inskedular.SchedulingTest do
       |> Enum.map(&Task.await/1)
     end
   end
+
+  describe "teams" do
+    alias Inskedular.Scheduling.Team
+
+    @valid_attrs %{name: "some name", schedule_uuid: "some schedule_uuid"}
+    @update_attrs %{name: "some updated name", schedule_uuid: "some updated schedule_uuid"}
+    @invalid_attrs %{name: nil, schedule_uuid: nil}
+
+    def team_fixture(attrs \\ %{}) do
+      {:ok, team} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Scheduling.create_team()
+
+      team
+    end
+
+    test "list_teams/0 returns all teams" do
+      team = team_fixture()
+      assert Scheduling.list_teams() == [team]
+    end
+
+    test "get_team!/1 returns the team with given id" do
+      team = team_fixture()
+      assert Scheduling.get_team!(team.id) == team
+    end
+
+    test "create_team/1 with valid data creates a team" do
+      assert {:ok, %Team{} = team} = Scheduling.create_team(@valid_attrs)
+      assert team.name == "some name"
+      assert team.schedule_uuid == "some schedule_uuid"
+    end
+
+    test "create_team/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Scheduling.create_team(@invalid_attrs)
+    end
+
+    test "update_team/2 with valid data updates the team" do
+      team = team_fixture()
+      assert {:ok, team} = Scheduling.update_team(team, @update_attrs)
+      assert %Team{} = team
+      assert team.name == "some updated name"
+      assert team.schedule_uuid == "some updated schedule_uuid"
+    end
+
+    test "update_team/2 with invalid data returns error changeset" do
+      team = team_fixture()
+      assert {:error, %Ecto.Changeset{}} = Scheduling.update_team(team, @invalid_attrs)
+      assert team == Scheduling.get_team!(team.id)
+    end
+
+    test "delete_team/1 deletes the team" do
+      team = team_fixture()
+      assert {:ok, %Team{}} = Scheduling.delete_team(team)
+      assert_raise Ecto.NoResultsError, fn -> Scheduling.get_team!(team.id) end
+    end
+
+    test "change_team/1 returns a team changeset" do
+      team = team_fixture()
+      assert %Ecto.Changeset{} = Scheduling.change_team(team)
+    end
+  end
 end
