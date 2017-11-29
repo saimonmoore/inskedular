@@ -1,9 +1,10 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
-import { Redirect, withRouter } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import { observer } from 'mobx-react'
 import schedules from '../../stores/schedules'
+import Teams from '../teams'
 
 class AddTeams extends Component {
   constructor(props) {
@@ -12,10 +13,25 @@ class AddTeams extends Component {
     this.state = { schedule_uuid }
   }
 
-  render() {
+  componentWillMount() {
+    schedules.fetch()
+  }
+
+  schedule() {
     const { schedule_uuid } = this.state
+    return schedules.find({ uuid: schedule_uuid })
+  }
+
+  render() {
+    if (schedules.isRequest('fetching')) {
+      return (<Loading label='schedule' />)
+    }
+
+    const schedule = this.schedule()
     return (
-      <h3>Click to add a team to Schedule: {schedule_uuid}</h3>
+      <div className="Schedule">
+      <Teams schedule={ schedule } />
+    </div>
     )
   }
 }
