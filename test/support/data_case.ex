@@ -22,6 +22,7 @@ defmodule Inskedular.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Inskedular.Factory
+      import Inskedular.Fixture
       import Inskedular.DataCase
     end
   end

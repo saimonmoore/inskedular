@@ -5,7 +5,7 @@ defmodule InskedularWeb.ScheduleView do
   alias InskedularWeb.ScheduleView
 
   def render("index.json", %{schedules: schedules}) do
-    %{data: render_many(schedules, ScheduleView, "schedule.json")}
+    render_many(schedules, ScheduleView, "schedule.json")
   end
 
   def render("show.json", %{schedule: schedule}) do

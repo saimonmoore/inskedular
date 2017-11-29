@@ -15,6 +15,17 @@ defmodule Inskedular.SchedulingTest do
     }
   end
 
+  describe "list schedules" do
+    setup [
+      :create_schedules
+    ]
+
+    @tag :integration
+    test "should list schedules", %{schedules: [schedule1, schedule2]} do
+      assert [schedule1, schedule2] == Scheduling.list_schedules()
+    end
+  end
+
   describe "create schedule" do
     @tag :integration
     test "succeeds with valid data", context do

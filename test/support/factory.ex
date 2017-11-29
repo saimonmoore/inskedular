@@ -23,11 +23,6 @@ defmodule Inskedular.Factory do
     }
   end
 
-  def build_schedule_params(attrs \\ []) do
-    build(:schedule_params, attrs) 
-    |> Map.new(fn {k, v} -> {Atom.to_string(k), v} end)
-  end
-
   def create_schedule_factory do
     struct(CreateSchedule, build(:schedule))
   end

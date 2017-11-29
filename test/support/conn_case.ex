@@ -20,6 +20,8 @@ defmodule InskedularWeb.ConnCase do
       # Import conveniences for testing with connections
       use Phoenix.ConnTest
       import InskedularWeb.Router.Helpers
+      import Inskedular.Factory
+      import Inskedular.Fixture
 
       # The default endpoint for testing
       @endpoint InskedularWeb.Endpoint

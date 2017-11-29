@@ -7,8 +7,17 @@ defmodule Inskedular.Scheduling do
 
   alias Inskedular.Scheduling.Commands.CreateSchedule
   alias Inskedular.Scheduling.Projections.Schedule
-  alias Inskedular.Scheduling.Queries.ScheduleByName
+  alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules}
   alias Inskedular.{Repo,Router}
+
+  @doc """
+  Returns most recent schedules globally by default.
+  """
+  @spec list_schedules(params :: map()) :: {schedules :: list(Schedule.t), schedule_count :: non_neg_integer()}
+  def list_schedules(params \\ %{})
+  def list_schedules(params) do
+    ListSchedules.execute(params, Repo)
+  end
 
   @doc """
   Create a Schedule

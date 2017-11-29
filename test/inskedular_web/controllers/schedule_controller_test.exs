@@ -1,8 +1,6 @@
 defmodule InskedularWeb.ScheduleControllerTest do
   use InskedularWeb.ConnCase
 
-  import Inskedular.Factory
- 
   alias Inskedular.Scheduling
   alias Inskedular.Scheduling.Schedule
 
@@ -12,6 +10,37 @@ defmodule InskedularWeb.ScheduleControllerTest do
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json") }
+  end
+
+  describe "list schedules" do
+    setup [
+      :create_schedules
+    ]
+
+    @web
+    test "renders list of schedules", %{conn: conn} do
+      conn = get conn, schedule_path(conn, :index)
+      schedules = json_response(conn, 200)
+
+      first_schedule = Enum.at(schedules, 0)
+      second_schedule = Enum.at(schedules, 1)
+
+      assert Map.delete(first_schedule, "uuid") == %{
+        "game_duration"   => 60,
+        "name"            => "Hack Week Tournament",
+        "number_of_games" => 4,
+        "start_date"      => "20-11-2017 12:00:00",
+        "end_date"        => "01-12-2017 12:00:00",
+      }
+
+      assert Map.delete(second_schedule, "uuid") == %{
+        "game_duration"   => 50,
+        "name"            => "Crypto Tournament",
+        "number_of_games" => 8,
+        "start_date"      => "20-11-2017 12:00:00",
+        "end_date"        => "01-12-2017 12:00:00",
+      }
+    end
   end
 
   describe "create schedule" do
