@@ -1,7 +1,7 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
-import { Redirect } from 'react-router-dom'
+import { withRouter, Redirect, Link } from 'react-router-dom'
 import { observer } from 'mobx-react'
 import moment from 'moment'
 import schedules from '../../stores/schedules'
@@ -9,6 +9,7 @@ import schedules from '../../stores/schedules'
 class ScheduleForm extends Component {
   constructor(props) {
     super(props)
+
     this.state = {
       form: {},
       submitted: false,
@@ -26,6 +27,27 @@ class ScheduleForm extends Component {
     this.handleChangeEndDate = this.handleChangeStartDate.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.createSchedule = this.createSchedule.bind(this)
+    this.updateSchedule = this.updateSchedule.bind(this)
+
+    if (!props.location.state) {
+      return
+    }
+    const { schedule_uuid } = props.location.state
+    if (schedule_uuid) {
+      this.state = Object.assign(this.state, this.schedule().toJS())
+    }
+  }
+
+  componentWillMount() {
+    schedules.fetch()
+  }
+
+  schedule() {
+    const { schedule_uuid } = this.props.location.state
+    if (!schedule_uuid) {
+      return null
+    }
+    return schedules.find({ uuid: schedule_uuid })
   }
 
   handleChangeName(event) {
@@ -66,8 +88,28 @@ class ScheduleForm extends Component {
     }, { optimistic: false })
   }
 
-  creatingSchedule() {
-    const promise = this.createSchedule()
+  updateSchedule() {
+    const schedule = this.schedule()
+    const {
+      name,
+      numberOfGames,
+      gameDuration,
+      startDate,
+      endDate,
+    } = this.state.form
+
+    return schedule.save({
+      name,
+      number_of_games: numberOfGames,
+      game_duration: gameDuration,
+      start_date: startDate,
+      end_date: endDate,
+    }, { optimistic: false })
+  }
+
+  createOrUpdateSchedule() {
+    const schedule = this.schedule()
+    const promise = schedule ? this.updateSchedule() : this.createSchedule()
     promise.then(json => {
       this.setState({ submitted: true, schedule_uuid: json.uuid })
     }).catch(error => {
@@ -110,7 +152,7 @@ class ScheduleForm extends Component {
       },
     }
     this.setState(data, () => {
-      this.creatingSchedule()
+      this.createOrUpdateSchedule()
       this.resetForm()
     })
     event.preventDefault()
@@ -125,6 +167,8 @@ class ScheduleForm extends Component {
                            }}/>
     }
 
+    const schedule = this.schedule()
+    const submitLabel = schedule ? 'Update' : 'Create'
     return (
       <form onSubmit={ this.handleSubmit }>
         <label>
@@ -168,10 +212,13 @@ class ScheduleForm extends Component {
             onChange={ this.handleChangeGameDuration } />
         </label>
 
-        <input type="submit" value="Create" />
+        <input type="submit" value={ submitLabel } />
+        {
+          schedule && <Link to={{ pathname: '/add_teams', state: { schedule_uuid: schedule.id } }}>Update Teams</Link>
+        }
       </form>
     )
   }
 }
 
-export default observer(ScheduleForm)
+export default withRouter(observer(ScheduleForm))

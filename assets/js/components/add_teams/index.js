@@ -1,7 +1,7 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
-import { withRouter, NavLink } from 'react-router-dom'
+import { withRouter, NavLink, Link } from 'react-router-dom'
 import { observer } from 'mobx-react'
 import schedules from '../../stores/schedules'
 import Loading from '../loading'
@@ -40,13 +40,14 @@ class AddTeams extends Component {
       return (
         <div className="Schedule">
           <h3>No schedule!</h3>
-          <NavLink to="/new_schedule" activeClassName="button">New Schedule</NavLink>
+          <NavLink to="/" activeClassName="button">Home</NavLink>
         </div>
       )
     }
     return (
       <div className="Schedule">
         <Teams schedule={ schedule } />
+        <Link to={{ pathname: '/new_schedule', state: { schedule_uuid: schedule.id } }}>Back</Link>
       </div>
     )
   }

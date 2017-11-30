@@ -11,6 +11,7 @@ import { apiClient } from 'mobx-rest'
 import adapter from 'mobx-rest-fetch-adapter'
 
 import ScheduleForm from '../schedule_form'
+import Schedules from '../schedules'
 import AddTeams from '../add_teams'
 
 import DevTools from 'mobx-react-devtools'
@@ -27,6 +28,7 @@ apiClient(adapter, {
 
 const Home = () => (
   <section className="box special">
+    <Schedules />
     <header className="major">
       <h2>New Schedule</h2>
       <p>Click to create a Schedule</p>
@@ -46,13 +48,20 @@ const NewSchedule = () => (
   </section>
 )
 
+const ShowSchedulePage = () => (
+  <section className="box special">
+    <header className="major">
+      <ScheduleForm />
+    </header>
+    <Link to="/">Back</Link>
+  </section>
+)
+
 const AddTeamsPage = () => (
   <section className="box special">
     <header className="major">
-      <h2>Add Teams</h2>
       <AddTeams />
     </header>
-    <Link to="/new_schedule">Back</Link>
   </section>
 )
 
@@ -63,6 +72,7 @@ const App = () => (
         <Route exact path="/" component={ Home }/>
         <Route path="/new_schedule" component={ NewSchedule }/>
         <Route path="/add_teams" component={ AddTeamsPage }/>
+        <Route path="/show_schedule" component={ ShowSchedulePage }/>
       </Switch>
       <DevTools />
     </div>
