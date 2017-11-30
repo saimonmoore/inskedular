@@ -46,6 +46,7 @@ class AddTeams extends Component {
     }
     return (
       <div className="Schedule">
+        <h3>Add your teams for: {schedule.get('name')}</h3>
         <Teams schedule={ schedule } />
         <Link to={{ pathname: '/new_schedule', state: { schedule_uuid: schedule.id } }}>Back</Link>
       </div>

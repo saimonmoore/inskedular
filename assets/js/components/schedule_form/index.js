@@ -44,10 +44,12 @@ class ScheduleForm extends Component {
 
   schedule() {
     const { schedule_uuid } = this.props.location.state
-    if (!schedule_uuid) {
+    const { uuid } = this.state
+    if (!uuid && !schedule_uuid) {
       return null
     }
-    return schedules.find({ uuid: schedule_uuid })
+    const scheduleId = uuid || schedule_uuid
+    return schedules.find({ uuid: scheduleId })
   }
 
   handleChangeName(event) {
@@ -108,10 +110,15 @@ class ScheduleForm extends Component {
   }
 
   createOrUpdateSchedule() {
-    const schedule = this.schedule()
+    let schedule
+    const { uuid } = this.state
+
+    if (uuid) {
+      schedule = this.schedule()
+    }
     const promise = schedule ? this.updateSchedule() : this.createSchedule()
     promise.then(json => {
-      this.setState({ submitted: true, schedule_uuid: json.uuid })
+      this.setState({ submitted: true, uuid: json.uuid })
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
     })
@@ -159,15 +166,19 @@ class ScheduleForm extends Component {
   }
 
   render() {
-    const { submitted, schedule_uuid } = this.state
+    let schedule
+    const { submitted, uuid } = this.state
     if (submitted) {
       return <Redirect to={{
                              pathname: '/add_teams',
-                             state: { schedule_uuid },
+                             state: { schedule_uuid: uuid },
                            }}/>
     }
 
-    const schedule = this.schedule()
+    if (uuid) {
+      schedule = this.schedule()
+    }
+
     const submitLabel = schedule ? 'Update' : 'Create'
     return (
       <form onSubmit={ this.handleSubmit }>
