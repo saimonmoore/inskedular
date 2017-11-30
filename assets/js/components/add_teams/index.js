@@ -1,7 +1,7 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
-import { withRouter } from 'react-router-dom'
+import { withRouter, NavLink } from 'react-router-dom'
 import { observer } from 'mobx-react'
 import schedules from '../../stores/schedules'
 import Loading from '../loading'
@@ -24,6 +24,9 @@ class AddTeams extends Component {
 
   schedule() {
     const { schedule_uuid } = this.state
+    if (!schedule_uuid) {
+      return null
+    }
     return schedules.find({ uuid: schedule_uuid })
   }
 

@@ -2,21 +2,20 @@
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react'
-import schedules from '../../stores/schedules'
 import teams from '../../stores/teams'
 import Loading from '../loading'
 import Team from '../team'
 import TeamForm from '../team_form'
 
 class Teams extends Component {
-  componentWillMount() {
-    const { schedule } = this.props
-    teams.fetch({ schedule_id: schedule.get('uuid') })
+  constructor(props) {
+    super(props)
+    this.state = { name: '' }
   }
 
-  schedule() {
-    const { schedule_uuid } = this.state
-    return schedules.find({ uuid: schedule_uuid })
+  componentWillMount() {
+    const { schedule } = this.props
+    teams.fetch({ data: { schedule_uuid: schedule.get('uuid') } })
   }
 
   render() {
@@ -24,14 +23,15 @@ class Teams extends Component {
       return <Loading label='teams' />
     }
 
+    const { schedule } = this.props
     return (
       <div className='Teams'>
         {
-          teams.models.forEach(team => (
+          teams.models.map(team => (
             <Team key={ team.id } team={ team } />
           ))
         }
-        <TeamForm teams={ teams } />
+        <TeamForm schedule ={ schedule } teams={ teams } />
       </div>
     )
   }

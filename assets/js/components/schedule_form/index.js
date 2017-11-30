@@ -69,7 +69,7 @@ class ScheduleForm extends Component {
   creatingSchedule() {
     const promise = this.createSchedule()
     promise.then(json => {
-      this.setState({ submitted: true, schedule_uuid: json.data.uuid })
+      this.setState({ submitted: true, schedule_uuid: json.uuid })
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
     })

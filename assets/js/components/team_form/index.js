@@ -13,12 +13,26 @@ export default observer(class TeamForm extends Component {
 
   onSubmit(event) {
     event.preventDefault()
-    const { teams } = this.props
-    teams.create({ name: this.state.team })
+    const { teams, schedule } = this.props
+    if (!schedule) {
+      this.setState({ error: 'No schedule' })
+      return
+    }
+    teams.create({
+      name: this.state.name,
+      schedule_uuid: schedule.id,
+    }, { optimistic: false })
+
+    this.setState({ error: null })
   }
 
   render() {
     const { teams } = this.props
+    const { error } = this.state
+
+    if (error) {
+      return <div className='FormError'>{error}</div>
+    }
 
     if (teams.isRequest('creating')) {
       return <div className='FormSaving'>Saving team...</div>
