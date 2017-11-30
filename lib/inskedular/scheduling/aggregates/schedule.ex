@@ -2,6 +2,7 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   defstruct [
     :uuid,
     :name,
+    :status,
     :start_date,
     :end_date,
     :number_of_games,

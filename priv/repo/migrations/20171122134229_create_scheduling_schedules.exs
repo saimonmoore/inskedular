@@ -5,6 +5,7 @@ defmodule Inskedular.Repo.Migrations.CreateSchedulingSchedules do
     create table(:scheduling_schedules, primary_key: false) do
       add :uuid, :uuid, primary_key: true
       add :name, :string
+      add :status, :string, default: "inactive"
       add :start_date, :timestamptz
       add :end_date, :timestamptz
       add :number_of_games, :integer
