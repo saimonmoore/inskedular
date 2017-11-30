@@ -5,10 +5,14 @@ defmodule Inskedular.Scheduling do
 
   use Inskedular.Support.Casting
 
-  alias Inskedular.Scheduling.Commands.CreateSchedule
-  alias Inskedular.Scheduling.Projections.Schedule
-  alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,CreateTeam}
+  alias Inskedular.Scheduling.Projections.{Schedule,Team}
+  alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams}
   alias Inskedular.{Repo,Router}
+
+  #######
+  # Schedule
+  #
 
   @doc """
   Returns most recent schedules globally by default.
@@ -27,7 +31,7 @@ defmodule Inskedular.Scheduling do
 
     create_schedule = 
       attrs
-      |> cast_attributes
+      |> cast_schedule_attributes
       |> assign(:schedule_uuid, uuid)
       |> CreateSchedule.new()
 
@@ -48,16 +52,7 @@ defmodule Inskedular.Scheduling do
     |> Repo.one()
   end
 
-  defp get(schema, uuid) do
-    case Repo.get(schema, uuid) do
-      nil -> {:error, :not_found}
-      projection -> {:ok, projection}
-    end
-  end
-
-  defp assign(attrs, key, value), do: Map.put(attrs, key, value)
-
-  defp cast_attributes(%{
+  defp cast_schedule_attributes(%{
     "game_duration" => game_duration,
     "number_of_games" => number_of_games,
     "start_date" => start_date_string,
@@ -75,99 +70,65 @@ defmodule Inskedular.Scheduling do
     }
   end
 
-  alias Inskedular.Scheduling.Team
+
+  #############
+  # TEAM
 
   @doc """
-  Returns the list of teams.
-
-  ## Examples
-
-      iex> list_teams()
-      [%Team{}, ...]
-
+  Returns most recent teams globally by default.
   """
-  def list_teams do
-    Repo.all(Team)
+  @spec list_teams(params :: map()) :: {teams :: list(Team.t), schedule_count :: non_neg_integer()}
+  def list_teams(params \\ %{})
+  def list_teams(params) do
+    params
+    |> cast_list_team_params
+    |> ListTeams.execute(Repo)
   end
 
   @doc """
-  Gets a single team.
-
-  Raises `Ecto.NoResultsError` if the Team does not exist.
-
-  ## Examples
-
-      iex> get_team!(123)
-      %Team{}
-
-      iex> get_team!(456)
-      ** (Ecto.NoResultsError)
-
-  """
-  def get_team!(id), do: Repo.get!(Team, id)
-
-  @doc """
-  Creates a team.
-
-  ## Examples
-
-      iex> create_team(%{field: value})
-      {:ok, %Team{}}
-
-      iex> create_team(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
+  Create a Team
   """
   def create_team(attrs \\ %{}) do
-    %Team{}
-    |> Team.changeset(attrs)
-    |> Repo.insert()
+    uuid = UUID.uuid4()
+
+    create_team = 
+      attrs
+      |> assign(:team_uuid, uuid)
+      |> CreateTeam.new()
+
+    with :ok <- Router.dispatch(create_team, consistency: :strong) do
+      get(Team, uuid)
+    else
+      reply -> reply
+    end
   end
 
   @doc """
-  Updates a team.
-
-  ## Examples
-
-      iex> update_team(team, %{field: new_value})
-      {:ok, %Team{}}
-
-      iex> update_team(team, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
+  Get an existing team by the name, or return `nil` if not present
   """
-  def update_team(%Team{} = team, attrs) do
-    team
-    |> Team.changeset(attrs)
-    |> Repo.update()
+  def team_by_name(name) when is_binary(name) do
+    name
+    |> TeamByName.new()
+    |> Repo.one()
   end
 
-  @doc """
-  Deletes a Team.
+  defp cast_list_team_params(%{
+    "schedule_uuid" => schedule_uuid,
+  }) do
 
-  ## Examples
-
-      iex> delete_team(team)
-      {:ok, %Team{}}
-
-      iex> delete_team(team)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_team(%Team{} = team) do
-    Repo.delete(team)
+    %{ schedule_uuid: schedule_uuid }
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking team changes.
+  ############
+  # Common
+  #
 
-  ## Examples
-
-      iex> change_team(team)
-      %Ecto.Changeset{source: %Team{}}
-
-  """
-  def change_team(%Team{} = team) do
-    Team.changeset(team, %{})
+  defp get(schema, uuid) do
+    case Repo.get(schema, uuid) do
+      nil -> {:error, :not_found}
+      projection -> {:ok, projection}
+    end
   end
+
+  defp assign(attrs, key, value), do: Map.put(attrs, key, value)
 end

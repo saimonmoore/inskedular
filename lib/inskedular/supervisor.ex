@@ -9,7 +9,8 @@ defmodule Inskedular.Scheduling.Supervisor do
 
   def init(_arg) do
     Supervisor.init([
-      Scheduling.Projectors.Schedule
+      Scheduling.Projectors.Schedule,
+      Scheduling.Projectors.Team,
     ], strategy: :one_for_one)
   end
 end

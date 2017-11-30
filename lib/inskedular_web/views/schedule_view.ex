@@ -9,7 +9,7 @@ defmodule InskedularWeb.ScheduleView do
   end
 
   def render("show.json", %{schedule: schedule}) do
-    %{data: render_one(schedule, ScheduleView, "schedule.json")}
+    render_one(schedule, ScheduleView, "schedule.json")
   end
 
   def render("schedule.json", %{schedule: schedule}) do

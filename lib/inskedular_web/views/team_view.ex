@@ -3,15 +3,15 @@ defmodule InskedularWeb.TeamView do
   alias InskedularWeb.TeamView
 
   def render("index.json", %{teams: teams}) do
-    %{data: render_many(teams, TeamView, "team.json")}
+    render_many(teams, TeamView, "team.json")
   end
 
   def render("show.json", %{team: team}) do
-    %{data: render_one(team, TeamView, "team.json")}
+    render_one(team, TeamView, "team.json")
   end
 
   def render("team.json", %{team: team}) do
-    %{id: team.id,
+    %{uuid: team.uuid,
       name: team.name,
       schedule_uuid: team.schedule_uuid}
   end
