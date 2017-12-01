@@ -5,7 +5,9 @@ defmodule Inskedular.Scheduling do
 
   use Inskedular.Support.Casting
 
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,CreateTeam}
+  import Comb
+
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,CreateTeam,StartSchedule}
   alias Inskedular.Scheduling.Projections.{Schedule,Team}
   alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams}
   alias Inskedular.{Repo,Router}
@@ -21,6 +23,17 @@ defmodule Inskedular.Scheduling do
   def list_schedules(params \\ %{})
   def list_schedules(params) do
     ListSchedules.execute(params, Repo)
+  end
+
+  @doc """
+  Update a Schedule's status
+  """
+  def update_schedule_status(%{"id" => schedule_uuid, "status" => status}) do
+    case status do
+      "start" -> start_schedule(schedule_uuid)
+      "stop"  -> stop_schedule(schedule_uuid)
+      _       -> nil
+    end
   end
 
   @doc """
@@ -55,6 +68,7 @@ defmodule Inskedular.Scheduling do
   defp cast_schedule_attributes(%{
     "game_duration" => game_duration,
     "number_of_games" => number_of_games,
+    "number_of_weeks" => number_of_weeks,
     "start_date" => start_date_string,
     "end_date" => end_date_string,
   } = attrs) do
@@ -64,12 +78,110 @@ defmodule Inskedular.Scheduling do
 
     %{attrs |
       "number_of_games" => String.to_integer(number_of_games),
+      "number_of_weeks" => String.to_integer(number_of_weeks),
       "game_duration" => String.to_integer(game_duration),
       "start_date" => start_date,
       "end_date" => end_date,
     }
   end
 
+  defp stop_schedule(_schedule_uuid) do
+  end
+
+  defp start_schedule(schedule_uuid) do
+    start_schedule = %{}
+      |> assign(:schedule_uuid, schedule_uuid)
+      |> StartSchedule.new()
+
+    with :ok <- Router.dispatch(start_schedule) do
+      get(Schedule, schedule_uuid)
+    else
+      reply -> reply
+    end
+  end
+
+  def create_matches(%{schedule_uuid: schedule_uuid, competition_type: competition_type, round_number: round_number}) do
+    commands = case competition_type do
+      :league -> create_league_matches(%{schedule_uuid: schedule_uuid, round_number: round_number})
+      :knockout -> create_knockout_matches(%{schedule_uuid: schedule_uuid, round_number: round_number})
+      _ -> []
+    end
+
+    case Enum.any?(commands) do
+      true -> commands ++ [matches_created(schedule_uuid)]
+      false -> []
+    end
+  end
+
+  # TODO: Calculate proper league combinations
+  defp create_league_matches(%{schedule_uuid: schedule_uuid, round_number: round_number}) do
+    schedule = get(Schedule, schedule_uuid)
+    teams = list_teams(%{"schedule_uuid" => schedule_uuid})
+
+    calculate_league_matches(schedule, teams, round_number)
+    |> Enum.map(
+      fn(match) -> create_match(match) end
+    )
+  end
+
+  # TODO: Calculate proper knockout combinations
+  defp create_knockout_matches(%{schedule_uuid: schedule_uuid, round_number: round_number}) do
+    schedule = get(Schedule, schedule_uuid)
+    teams = list_teams(%{"schedule_uuid" => schedule_uuid})
+
+    calculate_knockout_matches(schedule, teams, round_number)
+    |> Enum.map(
+      fn(match) -> create_match(match) end
+    )
+  end
+
+  defp calculate_league_matches(schedule, teams, _round_number) do
+    teams
+    |> Enum.map(fn(team) -> team.team_uuid end)
+    |> combinations(2)
+    |> Enum.with_index
+    |> Enum.map(fn(combination) ->
+      {pair, index} = combination
+      %{schedule_uuid: schedule.uuid, local_team_uuid: List.first(pair), away_team_uuid: List.last(pair), match_number: index, start_date: nil, end_date: nil }
+    end)
+  end
+
+  defp calculate_knockout_matches(schedule, teams, _round_number) do
+    teams
+    |> Enum.map(fn(team) -> team.team_uuid end)
+    |> combinations(2)
+    |> Enum.with_index
+    |> Enum.map(fn(combination) ->
+      {pair, index} = combination
+      %{schedule_uuid: schedule.uuid, local_team_uuid: List.first(pair), away_team_uuid: List.last(pair), match_number: index, start_date: nil, end_date: nil }
+    end)
+  end
+
+  defp create_match(%{schedule_uuid: schedule_uuid, local_team_uuid: local_team_uuid, away_team_uuid: away_team_uuid, match_number: match_number, start_date: start_date, end_date: end_date }) do
+    match_uuid = UUID.uuid4()
+
+    create_match = %{
+      match_number: match_number,
+      local_team_uuid: local_team_uuid,
+      away_team_uuid: away_team_uuid,
+      start_date: start_date,
+      end_date: end_date,
+    }
+    |> assign(:schedule_uuid, schedule_uuid)
+    |> assign(:match_uuid, match_uuid)
+    |> CreateMatch.new()
+
+    with :ok <- Router.dispatch(create_match) do
+      {:ok}
+    else
+      reply -> reply
+    end
+  end
+
+  defp matches_created(schedule_uuid) do
+    %{ schedule_uuid: schedule_uuid }
+    |> IncludeMatchesInSchedule.new()
+  end
 
   #############
   # TEAM
@@ -117,6 +229,20 @@ defmodule Inskedular.Scheduling do
   }) do
 
     %{ schedule_uuid: schedule_uuid }
+  end
+
+  ############
+  #
+  #  Match
+  #
+
+  @doc """
+  Returns matches by schedule 
+  """
+  @spec list_matches(params :: map()) :: {matches :: list(Match.t)}
+  def list_matches(params \\ %{})
+  def list_matches(params) do
+    ListMatches.execute(params, Repo)
   end
 
   ############

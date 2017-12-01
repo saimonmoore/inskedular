@@ -6,6 +6,7 @@ defmodule Inskedular.Scheduling.Events.ScheduleCreated do
     :start_date,
     :end_date,
     :number_of_games,
+    :number_of_weeks,
     :game_duration,
   ]
 end

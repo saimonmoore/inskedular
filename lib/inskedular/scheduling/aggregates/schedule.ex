@@ -6,12 +6,13 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     :start_date,
     :end_date,
     :number_of_games,
+    :number_of_weeks,
     :game_duration,
   ]
 
   alias Inskedular.Scheduling.Aggregates.Schedule
-  alias Inskedular.Scheduling.Commands.CreateSchedule
-  alias Inskedular.Scheduling.Events.ScheduleCreated
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,StartSchedule,IncludeMatchesInSchedule}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleStarted,MatchesCreated}
 
   @doc """
   Create a new schedule
@@ -23,7 +24,26 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
       start_date: create.start_date,
       end_date: create.end_date,
       number_of_games: create.number_of_games,
+      number_of_weeks: create.number_of_weeks,
       game_duration: create.game_duration
+    }
+  end
+
+  @doc """
+  Trigger start of schedule (Will create all the first round matches)
+  """
+  def execute(%Schedule{}, %StartSchedule{} = start) do
+    %ScheduleStarted{
+      schedule_uuid: start.schedule_uuid,
+    }
+  end
+
+  @doc """
+  Mark a schedule as running
+  """
+  def execute(%Schedule{}, %IncludeMatchesInSchedule{} = included_matches) do
+    %MatchesCreated{
+      schedule_uuid: included_matches.schedule_uuid,
     }
   end
 
@@ -36,7 +56,22 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
       start_date: created.start_date,
       end_date: created.end_date,
       number_of_games: created.number_of_games,
+      number_of_weeks: created.number_of_weeks,
       game_duration: created.game_duration
+    }
+  end
+
+  def apply(%Schedule{} = schedule, %IncludeMatchesInSchedule{} = included_matches) do
+    %Schedule{schedule |
+      uuid: included_matches.schedule_uuid,
+      status: "running",
+    }
+  end
+
+  def apply(%Schedule{} = schedule, %StartSchedule{} = start) do
+    %Schedule{schedule |
+      uuid: start.schedule_uuid,
+      status: "started",
     }
   end
 end

@@ -17,6 +17,11 @@ defmodule Inskedular.Application do
 
       # Scheduling supervisor
       supervisor(Inskedular.Scheduling.Supervisor, []),
+
+      # process managers
+      worker(Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager, []),
+
+      # Misc
       worker(Inskedular.Support.Unique, []),
     ]
 

@@ -10,6 +10,9 @@ export default withRouter(observer(class Schedule extends Component {
     }
   }
 
+  handleStartSchedule() {
+  }
+
   redirectToScheduleShow() {
     this.setState({ redirected: true })
   }
@@ -45,9 +48,13 @@ export default withRouter(observer(class Schedule extends Component {
       <div className={ className } >
         <span className="name" onClick={ this.redirectToScheduleShow.bind(this) }>{schedule.get('name')}</span>
         <span className="games">
-          {schedule.get('number_of_games')} games @ {schedule.get('game_duration')} minutes each
+          {schedule.get('number_of_games')} games in {schedule.get('number_of_weeks')} weeks
         </span>
-        <span className="actions"><button onClick={ this.handleStartSchedule }>{ scheduleStatus }</button></span>
+        <span className="actions">
+          <button onClick={ this.handleStartSchedule.bind(this) }>
+            { scheduleStatus }
+          </button>
+        </span>
       </div>
     )
   }

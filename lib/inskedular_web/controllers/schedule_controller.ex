@@ -18,4 +18,10 @@ defmodule InskedularWeb.ScheduleController do
       |> render("show.json", schedule: schedule)
     end
   end
+
+  def update_status(conn, %{"id" => schedule_uuid, "status" => status}) do
+    with :ok <- Scheduling.update_schedule_status(schedule_uuid, status) do
+      send_resp(conn, :no_content, "")
+    end
+  end
 end

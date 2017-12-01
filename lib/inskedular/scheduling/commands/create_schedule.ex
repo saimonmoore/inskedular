@@ -5,6 +5,7 @@ defmodule Inskedular.Scheduling.Commands.CreateSchedule do
     :start_date,
     :end_date,
     :number_of_games,
+    :number_of_weeks,
     :game_duration,
   ]
 
@@ -18,7 +19,8 @@ defmodule Inskedular.Scheduling.Commands.CreateSchedule do
   validates :schedule_uuid, uuid: true
   validates :name, presence: [message: "can't be empty"], string: true, by: &UniqueName.validate/2
   validates :number_of_games, presence: true, number: true
-  validates :game_duration, presence: true, number: true
+  validates :number_of_weeks, presence: true, number: true
+  validates :game_duration, number: true
 
   defimpl UniqueFields, for: CreateSchedule do
     def unique(%Inskedular.Scheduling.Commands.CreateSchedule{schedule_uuid: schedule_uuid}), do: [

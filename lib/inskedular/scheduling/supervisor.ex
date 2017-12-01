@@ -11,6 +11,7 @@ defmodule Inskedular.Scheduling.Supervisor do
     Supervisor.init([
       Scheduling.Projectors.Schedule,
       Scheduling.Projectors.Team,
+      Scheduling.Projectors.Match,
     ], strategy: :one_for_one)
   end
 end

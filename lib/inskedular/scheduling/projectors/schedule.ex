@@ -16,6 +16,7 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
       start_date: start_date,
       end_date: end_date,
       number_of_games: created.number_of_games,
+      number_of_weeks: created.number_of_weeks,
       game_duration: created.game_duration
     })
   end

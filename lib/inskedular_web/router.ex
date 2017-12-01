@@ -22,6 +22,7 @@ defmodule InskedularWeb.Router do
   scope "/api/v1", InskedularWeb do
     pipe_through :api
     resources "/schedules", ScheduleController, except: [:new, :edit]
+    put "/schedules/status/:id", ScheduleController, :update_status
     resources "/teams", TeamController, except: [:new, :edit]
   end
 end

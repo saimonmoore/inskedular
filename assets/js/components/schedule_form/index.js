@@ -15,6 +15,7 @@ class ScheduleForm extends Component {
       submitted: false,
       name: '',
       numberOfGames: 4,
+      numberOfWeeks: 1,
       gameDuration: 60,
       startDate: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
       endDate: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
@@ -22,6 +23,7 @@ class ScheduleForm extends Component {
 
     this.handleChangeName = this.handleChangeName.bind(this)
     this.handleChangeNumberOfGames = this.handleChangeNumberOfGames.bind(this)
+    this.handleChangeNumberOfWeeks = this.handleChangeNumberOfWeeks.bind(this)
     this.handleChangeGameDuration = this.handleChangeGameDuration.bind(this)
     this.handleChangeStartDate = this.handleChangeStartDate.bind(this)
     this.handleChangeEndDate = this.handleChangeStartDate.bind(this)
@@ -60,6 +62,10 @@ class ScheduleForm extends Component {
     this.setState({ numberOfGames: event.target.value })
   }
 
+  handleChangeNumberOfWeeks(event) {
+    this.setState({ numberOfWeeks: event.target.value })
+  }
+
   handleChangeGameDuration(event) {
     this.setState({ gameDuration: event.target.value })
   }
@@ -76,6 +82,7 @@ class ScheduleForm extends Component {
     const {
       name,
       numberOfGames,
+      numberOfWeeks,
       gameDuration,
       startDate,
       endDate,
@@ -84,6 +91,7 @@ class ScheduleForm extends Component {
     return schedules.create({
       name,
       number_of_games: numberOfGames,
+      number_of_games: numberOfWeeks,
       game_duration: gameDuration,
       start_date: startDate,
       end_date: endDate,
@@ -95,6 +103,7 @@ class ScheduleForm extends Component {
     const {
       name,
       numberOfGames,
+      numberOfWeeks,
       gameDuration,
       startDate,
       endDate,
@@ -103,6 +112,7 @@ class ScheduleForm extends Component {
     return schedule.save({
       name,
       number_of_games: numberOfGames,
+      number_of_weeks: numberOfWeeks,
       game_duration: gameDuration,
       start_date: startDate,
       end_date: endDate,
@@ -129,6 +139,7 @@ class ScheduleForm extends Component {
                                     input#schedule_start_date,
                                     input#schedule_end_date,
                                     input#schedule_number_of_games,
+                                    input#schedule_number_of_weeks,
                                     input#schedule_game_duration`)
   }
 
@@ -147,12 +158,14 @@ class ScheduleForm extends Component {
       startDate,
       endDate,
       numberOfGames,
+      numberOfWeeks,
       gameDuration,
     ] = nodes
     const data = {
       form: {
         name: name.value,
         numberOfGames: numberOfGames.value,
+        numberOfWeeks: numberOfWeeks.value,
         gameDuration: gameDuration.value,
         startDate: startDate.value,
         endDate: endDate.value,
@@ -207,12 +220,20 @@ class ScheduleForm extends Component {
             onChange={ this.handleChangeEndDate } />
         </label>
         <label>
-          Number of games per week:
+          Number of games:
           <input
             id='schedule_number_of_games'
             type="text"
             value={ this.state.numberOfGames }
             onChange={ this.handleChangeNumberOfGames } />
+        </label>
+        <label>
+          Number of weeks:
+          <input
+            id='schedule_number_of_weeks'
+            type="text"
+            value={ this.state.numberOfWeeks }
+            onChange={ this.handleChangeNumberOfWeeks } />
         </label>
         <label>
           Duration of each game (seconds):

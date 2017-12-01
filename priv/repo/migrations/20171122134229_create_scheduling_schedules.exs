@@ -9,6 +9,7 @@ defmodule Inskedular.Repo.Migrations.CreateSchedulingSchedules do
       add :start_date, :timestamptz
       add :end_date, :timestamptz
       add :number_of_games, :integer
+      add :number_of_weeks, :integer
       add :game_duration, :integer
 
       timestamps(type: :timestamptz)
