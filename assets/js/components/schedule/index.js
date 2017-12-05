@@ -6,15 +6,27 @@ export default withRouter(observer(class Schedule extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      redirected: false,
+      redirectedToShow: false,
+      redirectedToMatches: false,
     }
   }
 
   handleStartSchedule() {
+    const { schedule } = this.props
+
+    const promise = schedule.rpc(`status`, { status: 'start' })
+    // const promise = schedule.rpc(`status/${schedule.id}`, { status: 'start' }, { method: 'put' })
+
+    promise.then(json => {
+      console.error('After schedule start:', json)
+      this.setState({ redirectedToMatches: true, uuid: schedule.id })
+    }).catch(error => {
+      console.error(`There has been a problem with your fetch operation: ${error.message}`)
+    })
   }
 
   redirectToScheduleShow() {
-    this.setState({ redirected: true })
+    this.setState({ redirectedToShow: true })
   }
 
   scheduleStatusAction() {
@@ -30,9 +42,9 @@ export default withRouter(observer(class Schedule extends Component {
   }
 
   render() {
-    const { redirected } = this.state
+    const { redirectedToShow } = this.state
     const { schedule } = this.props
-    if (redirected) {
+    if (redirectedToShow) {
       return <Redirect to={{
                              pathname: '/show_schedule',
                              state: { schedule_uuid: schedule.id },

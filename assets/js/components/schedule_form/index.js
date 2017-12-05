@@ -91,7 +91,7 @@ class ScheduleForm extends Component {
     return schedules.create({
       name,
       number_of_games: numberOfGames,
-      number_of_games: numberOfWeeks,
+      number_of_weeks: numberOfWeeks,
       game_duration: gameDuration,
       start_date: startDate,
       end_date: endDate,
