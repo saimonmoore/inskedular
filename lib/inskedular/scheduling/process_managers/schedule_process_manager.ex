@@ -25,12 +25,17 @@ defmodule Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager do
   def interested?(_event), do: false
 
   def handle(%ScheduleProcessManager{schedule_uuid: schedule_uuid}, %ScheduleStarted{schedule_uuid: schedule_uuid, competition_type: competition_type}) do
-    Scheduling.create_matches(%{schedule_uuid: schedule_uuid, competition_type: competition_type, round_number: 0})
+    IO.puts "[#handle ScheduleStarted] =======> ...."
+    commands = Scheduling.create_matches(%{schedule_uuid: schedule_uuid, competition_type: competition_type, round_number: 0})
+    IO.puts "[#handle ScheduleStarted] =======> commands: #{inspect(commands)}"
+    commands
   end
 
-  def apply(%ScheduleProcessManager{} = process_manager, %ScheduleStarted{schedule_uuid: schedule_uuid}) do
+  def apply(%ScheduleProcessManager{} = process_manager, %ScheduleStarted{schedule_uuid: schedule_uuid, competition_type: competition_type}) do
+    IO.puts "[#apply ScheduleStarted] =======> ...."
     %ScheduleProcessManager{process_manager |
-      schedule_uuid: schedule_uuid
+      schedule_uuid: schedule_uuid,
+      competition_type: competition_type,
     }
   end
 

@@ -8,5 +8,5 @@ defmodule Inskedular.Scheduling.Commands.StartSchedule do
   use Vex.Struct
 
   validates :schedule_uuid, uuid: true
-  validates :competition_type, in: ~w(knockout league)
+  # validates :competition_type, in: ~w(knockout league)
 end

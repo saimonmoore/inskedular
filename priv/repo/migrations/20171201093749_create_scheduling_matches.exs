@@ -3,11 +3,11 @@ defmodule Inskedular.Repo.Migrations.CreateSchedulingMatches do
 
   def change do
     create table(:scheduling_matches, primary_key: false) do
-      add :uuid, :string, primary_key: true
-      add :schedule_uuid, :string
+      add :uuid, :uuid, primary_key: true
+      add :schedule_uuid, references(:scheduling_schedules, column: :uuid, on_delete: :delete_all, type: :uuid)
       add :match_number, :integer
-      add :local_team_uuid, :string
-      add :away_team_uuid, :string
+      add :local_team_uuid, :uuid
+      add :away_team_uuid, :uuid
       add :start_date, :timestamptz 
       add :end_date, :timestamptz 
       add :status, :string, default: "unplayed"

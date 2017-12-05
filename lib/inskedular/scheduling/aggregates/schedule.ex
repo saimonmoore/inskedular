@@ -35,6 +35,7 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   def execute(%Schedule{}, %StartSchedule{} = start) do
     %ScheduleStarted{
       schedule_uuid: start.schedule_uuid,
+      competition_type: start.competition_type,
     }
   end
 
@@ -61,16 +62,17 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     }
   end
 
-  def apply(%Schedule{} = schedule, %IncludeMatchesInSchedule{} = included_matches) do
+  def apply(%Schedule{} = schedule, %MatchesCreated{} = created) do
     %Schedule{schedule |
-      uuid: included_matches.schedule_uuid,
+      uuid: created.schedule_uuid,
       status: "running",
     }
   end
 
-  def apply(%Schedule{} = schedule, %StartSchedule{} = start) do
+  # TODO: Add `competition_type`
+  def apply(%Schedule{} = schedule, %ScheduleStarted{} = started) do
     %Schedule{schedule |
-      uuid: start.schedule_uuid,
+      uuid: started.schedule_uuid,
       status: "started",
     }
   end

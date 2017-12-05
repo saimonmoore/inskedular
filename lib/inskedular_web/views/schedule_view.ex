@@ -22,6 +22,7 @@ defmodule InskedularWeb.ScheduleView do
       start_date: start_date,
       end_date:  end_date,
       number_of_games: schedule.number_of_games,
+      number_of_weeks: schedule.number_of_weeks,
       game_duration: schedule.game_duration}
   end
 end

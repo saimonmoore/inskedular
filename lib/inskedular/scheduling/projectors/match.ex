@@ -10,6 +10,7 @@ defmodule Inskedular.Scheduling.Projectors.Match do
     {:ok, start_date} = cast_datetime(created.start_date)
     {:ok, end_date} = cast_datetime(created.end_date)
 
+    IO.puts "[Projector.Match#project] =======> created: #{inspect(created)} "
     Ecto.Multi.insert(multi, :match, %Match{
       uuid: created.match_uuid,
       schedule_uuid: created.schedule_uuid,

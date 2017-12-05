@@ -1,7 +1,6 @@
 defmodule Inskedular.Scheduling.Aggregates.Match do
   defstruct [
     :uuid,
-    :match_uuid,
     :schedule_uuid,
     :status,
     :result,

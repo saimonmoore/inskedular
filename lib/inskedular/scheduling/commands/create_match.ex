@@ -1,5 +1,6 @@
 defmodule Inskedular.Scheduling.Commands.CreateMatch do
   defstruct [
+    :match_uuid,
     :schedule_uuid,
     :match_number,
     :local_team_uuid,
@@ -12,9 +13,7 @@ defmodule Inskedular.Scheduling.Commands.CreateMatch do
   use Vex.Struct
 
   validates :schedule_uuid, uuid: true
-  validates :match_uuid, uuid: true
+  validates :match_number, number: true
   validates :local_team_uuid, uuid: true
   validates :away_team_uuid, uuid: true
-  validates :start_date, presence: true
-  validates :end_date, presence: true
 end
