@@ -8,6 +8,7 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     :number_of_games,
     :number_of_weeks,
     :game_duration,
+    :competition_type,
   ]
 
   alias Inskedular.Scheduling.Aggregates.Schedule
@@ -25,7 +26,8 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
       end_date: create.end_date,
       number_of_games: create.number_of_games,
       number_of_weeks: create.number_of_weeks,
-      game_duration: create.game_duration
+      game_duration: create.game_duration,
+      competition_type: create.competition_type,
     }
   end
 
@@ -35,7 +37,7 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   def execute(%Schedule{}, %StartSchedule{} = start) do
     %ScheduleStarted{
       schedule_uuid: start.schedule_uuid,
-      competition_type: start.competition_type,
+      status: "started",
     }
   end
 
@@ -45,6 +47,7 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   def execute(%Schedule{}, %IncludeMatchesInSchedule{} = included_matches) do
     %MatchesCreated{
       schedule_uuid: included_matches.schedule_uuid,
+      status: "running",
     }
   end
 
@@ -54,6 +57,7 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     %Schedule{schedule |
       uuid: created.schedule_uuid,
       name: created.name,
+      competition_type: created.competition_type,
       start_date: created.start_date,
       end_date: created.end_date,
       number_of_games: created.number_of_games,
@@ -65,15 +69,14 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   def apply(%Schedule{} = schedule, %MatchesCreated{} = created) do
     %Schedule{schedule |
       uuid: created.schedule_uuid,
-      status: "running",
+      status: created.status,
     }
   end
 
-  # TODO: Add `competition_type`
   def apply(%Schedule{} = schedule, %ScheduleStarted{} = started) do
     %Schedule{schedule |
       uuid: started.schedule_uuid,
-      status: "started",
+      status: started.status,
     }
   end
 end

@@ -18,6 +18,7 @@ defmodule InskedularWeb.ScheduleView do
 
     %{uuid: schedule.uuid,
       name: schedule.name,
+      competition_type: schedule.competition_type,
       status: schedule.status,
       start_date: start_date,
       end_date:  end_date,

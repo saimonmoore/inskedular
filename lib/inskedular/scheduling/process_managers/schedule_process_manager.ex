@@ -10,7 +10,6 @@ defmodule Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager do
 
   defstruct [
     schedule_uuid: nil,
-    competition_type: nil,
     round_number: 0,
     matches: [],
   ]
@@ -24,22 +23,22 @@ defmodule Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager do
   def interested?(%MatchesCreated{schedule_uuid: schedule_uuid}), do: {:stop, schedule_uuid}
   def interested?(_event), do: false
 
-  def handle(%ScheduleProcessManager{schedule_uuid: schedule_uuid}, %ScheduleStarted{schedule_uuid: schedule_uuid, competition_type: competition_type}) do
-    IO.puts "[#handle ScheduleStarted] =======> ...."
-    commands = Scheduling.create_matches(%{schedule_uuid: schedule_uuid, competition_type: competition_type, round_number: 0})
+  def handle(%ScheduleProcessManager{schedule_uuid: schedule_uuid}, %ScheduleStarted{schedule_uuid: schedule_uuid}) do
+    IO.puts "[ScheduleProcessManager#handle ScheduleStarted] =======> ...."
+    commands = Scheduling.create_matches(%{schedule_uuid: schedule_uuid, round_number: 0})
     IO.puts "[#handle ScheduleStarted] =======> commands: #{inspect(commands)}"
     commands
   end
 
-  def apply(%ScheduleProcessManager{} = process_manager, %ScheduleStarted{schedule_uuid: schedule_uuid, competition_type: competition_type}) do
-    IO.puts "[#apply ScheduleStarted] =======> ...."
+  def apply(%ScheduleProcessManager{} = process_manager, %ScheduleStarted{schedule_uuid: schedule_uuid}) do
+    IO.puts "[ScheduleProcessManager#apply ScheduleStarted] =======> ...."
     %ScheduleProcessManager{process_manager |
       schedule_uuid: schedule_uuid,
-      competition_type: competition_type,
     }
   end
 
   def apply(%ScheduleProcessManager{matches: matches} = process_manager, %MatchCreated{} = match) do
+    IO.puts "[ScheduleProcessManager#apply MatchCreated] =======> ...."
     %ScheduleProcessManager{process_manager |
       matches: matches ++ [match]
     }

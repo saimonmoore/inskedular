@@ -14,6 +14,7 @@ class ScheduleForm extends Component {
       form: {},
       submitted: false,
       name: '',
+      competition_type: 'league',
       numberOfGames: 4,
       numberOfWeeks: 1,
       gameDuration: 60,
@@ -21,12 +22,7 @@ class ScheduleForm extends Component {
       endDate: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
     }
 
-    this.handleChangeName = this.handleChangeName.bind(this)
-    this.handleChangeNumberOfGames = this.handleChangeNumberOfGames.bind(this)
-    this.handleChangeNumberOfWeeks = this.handleChangeNumberOfWeeks.bind(this)
-    this.handleChangeGameDuration = this.handleChangeGameDuration.bind(this)
-    this.handleChangeStartDate = this.handleChangeStartDate.bind(this)
-    this.handleChangeEndDate = this.handleChangeStartDate.bind(this)
+    this.handleInputChange = this.handleInputChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.createSchedule = this.createSchedule.bind(this)
     this.updateSchedule = this.updateSchedule.bind(this)
@@ -54,33 +50,20 @@ class ScheduleForm extends Component {
     return schedules.find({ uuid: scheduleId })
   }
 
-  handleChangeName(event) {
-    this.setState({ name: event.target.value })
-  }
+  handleInputChange(event) {
+    const { target } = event
+    const value = target.type === 'checkbox' ? target.checked : target.value
+    const { name } = target
 
-  handleChangeNumberOfGames(event) {
-    this.setState({ numberOfGames: event.target.value })
-  }
-
-  handleChangeNumberOfWeeks(event) {
-    this.setState({ numberOfWeeks: event.target.value })
-  }
-
-  handleChangeGameDuration(event) {
-    this.setState({ gameDuration: event.target.value })
-  }
-
-  handleChangeStartDate(event) {
-    this.setState({ startDate: event.target.value })
-  }
-
-  handleChangeEndDate(event) {
-    this.setState({ endDate: event.target.value })
+    this.setState({
+      [name]: value,
+    })
   }
 
   createSchedule() {
     const {
       name,
+      competitionType,
       numberOfGames,
       numberOfWeeks,
       gameDuration,
@@ -90,6 +73,7 @@ class ScheduleForm extends Component {
 
     return schedules.create({
       name,
+      competition_type: competitionType,
       number_of_games: numberOfGames,
       number_of_weeks: numberOfWeeks,
       game_duration: gameDuration,
@@ -102,6 +86,7 @@ class ScheduleForm extends Component {
     const schedule = this.schedule()
     const {
       name,
+      competitionType,
       numberOfGames,
       numberOfWeeks,
       gameDuration,
@@ -111,6 +96,7 @@ class ScheduleForm extends Component {
 
     return schedule.save({
       name,
+      competition_type: competitionType,
       number_of_games: numberOfGames,
       number_of_weeks: numberOfWeeks,
       game_duration: gameDuration,
@@ -136,6 +122,7 @@ class ScheduleForm extends Component {
 
   inputNodes() {
     return document.querySelectorAll(`input#schedule_name,
+                                    select#schedule_competition_type,
                                     input#schedule_start_date,
                                     input#schedule_end_date,
                                     input#schedule_number_of_games,
@@ -152,24 +139,13 @@ class ScheduleForm extends Component {
 
   handleSubmit(event) {
     const nodes = this.inputNodes()
+    const form = {}
+    nodes.forEach(node => {
+      form[node.name] = node.value
+    })
 
-    const [
-      name,
-      startDate,
-      endDate,
-      numberOfGames,
-      numberOfWeeks,
-      gameDuration,
-    ] = nodes
     const data = {
-      form: {
-        name: name.value,
-        numberOfGames: numberOfGames.value,
-        numberOfWeeks: numberOfWeeks.value,
-        gameDuration: gameDuration.value,
-        startDate: startDate.value,
-        endDate: endDate.value,
-      },
+      form,
     }
     this.setState(data, () => {
       this.createOrUpdateSchedule()
@@ -199,49 +175,66 @@ class ScheduleForm extends Component {
           Name:
           <input
             id='schedule_name'
+            name='name'
             type="text"
             value={ this.state.name }
-            onChange={ this.handleChangeName } />
+            onChange={ this.handleInputChange } />
+        </label>
+        <label>
+          Competition Type:
+          <select
+            id='schedule_competition_type'
+            name='competitionType'
+            value={ this.state.competition_type }
+            onChange={ this.handleInputChange } >
+            <option value="league">League</option>
+            <option value="knockout">Knockout</option>
+          </select>
         </label>
         <label>
           Starting on:
           <input
             id='schedule_start_date'
+            name='startDate'
             type="text"
             value={ this.state.startDate }
-            onChange={ this.handleChangeStartDate } />
+            onChange={ this.handleInputChange } />
         </label>
         <label>
           Ending on:
           <input
             id='schedule_end_date'
             type="text"
+            name='endDate'
             value={ this.state.endDate }
-            onChange={ this.handleChangeEndDate } />
+            onChange={ this.handleInputChange } />
         </label>
         <label>
           Number of games:
           <input
             id='schedule_number_of_games'
+            name='numberOfGames'
             type="text"
             value={ this.state.numberOfGames }
-            onChange={ this.handleChangeNumberOfGames } />
+            onChange={ this.handleInputChange } />
         </label>
         <label>
           Number of weeks:
           <input
             id='schedule_number_of_weeks'
+            name='numberOfWeeks'
             type="text"
             value={ this.state.numberOfWeeks }
-            onChange={ this.handleChangeNumberOfWeeks } />
+            onChange={ this.handleInputChange } />
         </label>
         <label>
           Duration of each game (seconds):
           <input
             id='schedule_game_duration'
             type="text"
+            name='gameDuration'
             value={ this.state.gameDuration }
-            onChange={ this.handleChangeGameDuration } />
+            onChange={ this.handleInputChange } />
         </label>
 
         <input type="submit" value={ submitLabel } />

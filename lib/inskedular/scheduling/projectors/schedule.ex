@@ -3,7 +3,7 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
                                   consistency: :strong
   use Inskedular.Support.Casting
 
-  alias Inskedular.Scheduling.Events.ScheduleCreated
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleStarted,MatchesCreated}
   alias Inskedular.Scheduling.Projections.Schedule
 
   project %ScheduleCreated{} = created do
@@ -13,11 +13,28 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
     Ecto.Multi.insert(multi, :schedule, %Schedule{
       uuid: created.schedule_uuid,
       name: created.name,
+      competition_type: created.competition_type,
       start_date: start_date,
       end_date: end_date,
       number_of_games: created.number_of_games,
       number_of_weeks: created.number_of_weeks,
       game_duration: created.game_duration
     })
+  end
+
+  project %ScheduleStarted{} = started do
+    Ecto.Multi.update_all(multi, :schedule, schedule_query(started.schedule_uuid), set: [
+      status: started.status,
+    ])
+  end
+
+  project %MatchesCreated{} = created do
+    Ecto.Multi.update_all(multi, :schedule, schedule_query(created.schedule_uuid), set: [
+      status: created.status,
+    ])
+  end
+
+  defp schedule_query(schedule_uuid) do
+    from(a in Schedule, where: a.uuid == ^schedule_uuid)
   end
 end

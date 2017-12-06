@@ -9,7 +9,7 @@ defmodule Inskedular.Scheduling do
 
   alias Inskedular.Scheduling.Commands.{CreateSchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule}
   alias Inskedular.Scheduling.Projections.{Schedule,Team}
-  alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams}
+  alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches}
   alias Inskedular.{Repo,Router}
 
   #######
@@ -91,7 +91,6 @@ defmodule Inskedular.Scheduling do
   defp start_schedule(schedule_uuid) do
     start_schedule = %{}
       |> assign(:schedule_uuid, schedule_uuid)
-      |> assign(:competition_type, "league")
       |> StartSchedule.new()
 
     with :ok <- Router.dispatch(start_schedule) do
@@ -101,11 +100,12 @@ defmodule Inskedular.Scheduling do
     end
   end
 
-  def create_matches(%{schedule_uuid: schedule_uuid, competition_type: competition_type, round_number: round_number}) do
-    IO.puts "[Scheduling#create_matches] =======> competition_type: #{competition_type} id: #{schedule_uuid}"
+  def create_matches(%{schedule_uuid: schedule_uuid, round_number: round_number}) do
+    IO.puts "[Scheduling#create_matches] =======> id: #{schedule_uuid}"
+    {:ok, %Schedule{competition_type: competition_type} = schedule} = get(Schedule, schedule_uuid)
     commands = case String.to_atom(competition_type) do
-      :league -> create_league_matches(%{schedule_uuid: schedule_uuid, round_number: round_number})
-      :knockout -> create_knockout_matches(%{schedule_uuid: schedule_uuid, round_number: round_number})
+      :league -> create_league_matches(%{schedule: schedule, round_number: round_number})
+      :knockout -> create_knockout_matches(%{schedule: schedule, round_number: round_number})
       _ -> []
     end
 
@@ -116,11 +116,10 @@ defmodule Inskedular.Scheduling do
   end
 
   # TODO: Calculate proper league combinations
-  defp create_league_matches(%{schedule_uuid: schedule_uuid, round_number: round_number}) do
-    IO.puts "[Scheduling#create_league_matches] =======> id: #{schedule_uuid}"
-    {:ok, %Schedule{} = schedule} = get(Schedule, schedule_uuid)
+  defp create_league_matches(%{schedule: schedule, round_number: round_number}) do
+    IO.puts "[Scheduling#create_league_matches] =======> id: #{schedule.uuid}"
     IO.puts "[Scheduling#create_league_matches] =======> schedule: #{inspect(schedule)}"
-    teams = list_teams(%{"schedule_uuid" => schedule_uuid})
+    teams = list_teams(%{"schedule_uuid" => schedule.uuid})
     IO.puts "[Scheduling#create_league_matches] =======> teams: #{length(teams)}"
 
     calculate_league_matches(schedule, teams, round_number)

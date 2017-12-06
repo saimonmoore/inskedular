@@ -3,6 +3,7 @@ defmodule Inskedular.Scheduling.Events.ScheduleCreated do
   defstruct [
     :schedule_uuid,
     :name,
+    :competition_type,
     :start_date,
     :end_date,
     :number_of_games,

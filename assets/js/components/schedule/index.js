@@ -18,7 +18,6 @@ export default withRouter(observer(class Schedule extends Component {
     // const promise = schedule.rpc(`status/${schedule.id}`, { status: 'start' }, { method: 'put' })
 
     promise.then(json => {
-      console.error('After schedule start:', json)
       this.setState({ redirectedToMatches: true, uuid: schedule.id })
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
@@ -59,6 +58,7 @@ export default withRouter(observer(class Schedule extends Component {
     return (
       <div className={ className } >
         <span className="name" onClick={ this.redirectToScheduleShow.bind(this) }>{schedule.get('name')}</span>
+        <span className="competition_type">{schedule.get('competition_type')}</span>
         <span className="games">
           {schedule.get('number_of_games')} games in {schedule.get('number_of_weeks')} weeks
         </span>

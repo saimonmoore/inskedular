@@ -6,6 +6,7 @@ defmodule Inskedular.Scheduling.Projections.Schedule do
   schema "scheduling_schedules" do
     field :name, :string
     field :status, :string
+    field :competition_type, :string
     field :number_of_games, :integer
     field :number_of_weeks, :integer
     field :game_duration, :integer

@@ -2,6 +2,7 @@ defmodule Inskedular.Scheduling.Commands.CreateSchedule do
   defstruct [
     :schedule_uuid,
     :name,
+    :competition_type,
     :start_date,
     :end_date,
     :number_of_games,
@@ -21,6 +22,7 @@ defmodule Inskedular.Scheduling.Commands.CreateSchedule do
   validates :number_of_games, presence: true, number: true
   validates :number_of_weeks, presence: true, number: true
   validates :game_duration, number: true
+  validates :competition_type, presence: true #, in: ~w(knockout league)
 
   defimpl UniqueFields, for: CreateSchedule do
     def unique(%Inskedular.Scheduling.Commands.CreateSchedule{schedule_uuid: schedule_uuid}), do: [
