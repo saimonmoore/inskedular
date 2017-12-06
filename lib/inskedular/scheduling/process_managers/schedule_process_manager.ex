@@ -23,7 +23,7 @@ defmodule Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager do
   def interested?(%MatchesCreated{schedule_uuid: schedule_uuid}), do: {:stop, schedule_uuid}
   def interested?(_event), do: false
 
-  def handle(%ScheduleProcessManager{schedule_uuid: schedule_uuid}, %ScheduleStarted{schedule_uuid: schedule_uuid}) do
+  def handle(%ScheduleProcessManager{}, %ScheduleStarted{schedule_uuid: schedule_uuid}) do
     IO.puts "[ScheduleProcessManager#handle ScheduleStarted] =======> ...."
     commands = Scheduling.create_matches(%{schedule_uuid: schedule_uuid, round_number: 0})
     IO.puts "[#handle ScheduleStarted] =======> commands: #{inspect(commands)}"
