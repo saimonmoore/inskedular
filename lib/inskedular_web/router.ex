@@ -25,5 +25,6 @@ defmodule InskedularWeb.Router do
     # TODO PUT
     post "/schedules/:id/status", ScheduleController, :update_status
     resources "/teams", TeamController, except: [:new, :edit]
+    resources "/matches", MatchController, except: [:new, :edit]
   end
 end

@@ -8,6 +8,7 @@ defmodule InskedularWeb.TeamController do
 
   def index(conn, params) do
     teams = Scheduling.list_teams(params)
+    IO.puts "[TeamController#index] teams: #{inspect(teams)} for: #{inspect(params)}"
     render(conn, "index.json", teams: teams)
   end
 
