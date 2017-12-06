@@ -13,6 +13,7 @@ import adapter from 'mobx-rest-fetch-adapter'
 import ScheduleForm from '../schedule_form'
 import Schedules from '../schedules'
 import AddTeams from '../add_teams'
+import Matches from '../matches'
 
 import DevTools from 'mobx-react-devtools'
 
@@ -65,6 +66,14 @@ const AddTeamsPage = () => (
   </section>
 )
 
+const MatchesPage = () => (
+  <section className="box special">
+    <header className="major">
+      <Matches />
+    </header>
+  </section>
+)
+
 const App = () => (
   <Router>
     <div className="features-row">
@@ -73,6 +82,7 @@ const App = () => (
         <Route path="/new_schedule" component={ NewSchedule }/>
         <Route path="/add_teams" component={ AddTeamsPage }/>
         <Route path="/show_schedule" component={ ShowSchedulePage }/>
+        <Route path="/matches/:schedule_uuid" component={ MatchesPage }/>
       </Switch>
       <DevTools />
     </div>
