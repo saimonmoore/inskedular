@@ -97,7 +97,9 @@ export default withRouter(observer(class Schedule extends Component {
 
     return (
       <div className={ className } >
-        <span className="name" onClick={ this.redirectToScheduleShow.bind(this) }>{schedule.get('name')}</span>
+        <span className="name" onClick={ this.redirectToScheduleShow.bind(this) } style={{ cursor: 'pointer' }}>
+          {schedule.get('name')}
+        </span>
         &nbsp;
         <span className="competition_type">({schedule.get('competition_type')})</span>
         &nbsp;

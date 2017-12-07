@@ -15,8 +15,6 @@ import Schedules from '../schedules'
 import AddTeams from '../add_teams'
 import Matches from '../matches'
 
-import DevTools from 'mobx-react-devtools'
-
 // Initialize mob-rest API adapter
 apiClient(adapter, {
   commonOptions: {
@@ -84,7 +82,6 @@ const App = () => (
         <Route path="/show_schedule" component={ ShowSchedulePage }/>
         <Route path="/matches/:schedule_uuid" component={ MatchesPage }/>
       </Switch>
-      <DevTools />
     </div>
   </Router>
 )

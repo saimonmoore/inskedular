@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import matches from '../../stores/matches'
 import schedules from '../../stores/schedules'
 import teams from '../../stores/teams'
@@ -35,7 +35,6 @@ class Matches extends Component {
   }
 
   render() {
-    // const { schedule } = this.props
     if (matches.isRequest('fetching')) {
       return <Loading label='matches' />
     }
@@ -61,11 +60,26 @@ class Matches extends Component {
     return (
       <div className='Matches'>
         <h3>Matches for { schedule.get('name') }</h3>
+        <table>
+          <thead>
+            <tr>
+              <td>Number</td>
+              <td>Local</td>
+              <td>Away</td>
+              <td>Status</td>
+              <td>Result</td>
+              <td>Action</td>
+            </tr>
+          </thead>
+          <tbody>
         {
           matches.models.map(match => (
             <Match key={ match.id } match={ match } schedule={ schedule } teams={ teams } />
           ))
         }
+          </tbody>
+        </table>
+        <Link to={{ pathname: '/' }}>Back</Link>
       </div>
     )
   }
