@@ -3,7 +3,7 @@ defmodule Inskedular.Scheduling.Projectors.Match do
                                   consistency: :strong
   use Inskedular.Support.Casting
 
-  alias Inskedular.Scheduling.Events.MatchCreated
+  alias Inskedular.Scheduling.Events.{MatchCreated,MatchUpdated}
   alias Inskedular.Scheduling.Projections.Match
 
   project %MatchCreated{} = created do
@@ -20,5 +20,19 @@ defmodule Inskedular.Scheduling.Projectors.Match do
       start_date: start_date,
       end_date: end_date,
     })
+  end
+
+  project %MatchUpdated{} = updated do
+    IO.puts "[Projector.Match#project updated] =======> updated: #{inspect(updated)} "
+    Ecto.Multi.update_all(multi, :match, match_query(updated.match_uuid), set: [
+      status: updated.status,
+      score_local_team: updated.score_local_team,
+      score_away_team: updated.score_away_team,
+      result: updated.result,
+    ])
+  end
+
+  defp match_query(match_uuid) do
+    from(a in Match, where: a.uuid == ^match_uuid)
   end
 end

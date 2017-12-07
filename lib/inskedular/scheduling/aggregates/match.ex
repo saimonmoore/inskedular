@@ -14,8 +14,8 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
   ]
 
   alias Inskedular.Scheduling.Aggregates.Match
-  alias Inskedular.Scheduling.Commands.{CreateMatch}
-  alias Inskedular.Scheduling.Events.{MatchCreated}
+  alias Inskedular.Scheduling.Commands.{CreateMatch,UpdateMatch}
+  alias Inskedular.Scheduling.Events.{MatchCreated,MatchUpdated}
 
   @doc """
   Create a new match
@@ -32,6 +32,19 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
     }
   end
 
+  @doc """
+  Update a new match
+  """
+  def execute(%Match{}, %UpdateMatch{} = update) do
+    %MatchUpdated{
+      match_uuid: update.match_uuid,
+      status: update.status,
+      score_local_team: update.score_local_team,
+      score_away_team: update.score_away_team,
+      result: update.result,
+    }
+  end
+
   # state mutators
 
   def apply(%Match{} = match, %MatchCreated{} = created) do
@@ -43,6 +56,16 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
       away_team_uuid: created.away_team_uuid,
       start_date: created.start_date,
       end_date: created.end_date,
+    }
+  end
+
+  def apply(%Match{} = match, %MatchUpdated{} = updated) do
+    %Match{match |
+      uuid: updated.match_uuid,
+      status: updated.status,
+      score_local_team: updated.score_local_team,
+      score_away_team: updated.score_away_team,
+      result: updated.result,
     }
   end
 end

@@ -11,7 +11,7 @@ defmodule InskedularWeb.MatchView do
   end
 
   def render("match.json", %{match: match}) do
-    %{id: match.uuid,
+    %{uuid: match.uuid,
       schedule_uuid: match.schedule_uuid,
       local_team_uuid: match.local_team_uuid,
       away_team_uuid: match.away_team_uuid,

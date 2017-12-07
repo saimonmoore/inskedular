@@ -7,8 +7,8 @@ defmodule Inskedular.Scheduling do
 
   import Comb
 
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule}
-  alias Inskedular.Scheduling.Projections.{Schedule,Team}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule,UpdateMatch}
+  alias Inskedular.Scheduling.Projections.{Schedule,Team,Match}
   alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches}
   alias Inskedular.{Repo,Router}
 
@@ -257,6 +257,35 @@ defmodule Inskedular.Scheduling do
   def list_matches(params \\ %{})
   def list_matches(params) do
     ListMatches.execute(params, Repo)
+  end
+
+  @doc """
+  Update a Match
+  """
+  def update_match(%{"id" => uuid} = attrs \\ %{}) do
+    update_match = 
+      attrs
+      |> assign(:match_uuid, uuid)
+      |> Map.delete("id")
+      |> cast_match_attributes
+      |> UpdateMatch.new
+
+    with :ok <- Router.dispatch(update_match, consistency: :strong) do
+      get(Match, uuid)
+    else
+      reply -> reply
+    end
+  end
+
+  defp cast_match_attributes(%{
+    "score_local_team" => score_local_team,
+    "score_away_team" => score_away_team,
+  } = attrs) do
+
+    %{attrs |
+      "score_local_team" => String.to_integer(score_local_team),
+      "score_away_team" => String.to_integer(score_away_team),
+    }
   end
 
   ############
