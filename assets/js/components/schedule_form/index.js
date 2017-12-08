@@ -1,10 +1,16 @@
 /* eslint no-param-reassign: ["error", { "props": true, "ignorePropertyModificationsFor": ["node"] }] */
 
 import React, { Component } from 'react' // eslint-disable-line no-unused-vars
-import { withRouter, Redirect, Link } from 'react-router-dom'
+import { withRouter, Redirect, NavLink } from 'react-router-dom'
 import { observer } from 'mobx-react'
 import moment from 'moment'
 import schedules from '../../stores/schedules'
+
+const WrappedLink = props => (
+  <button className='button' style={{ marginLeft: '250px' }}>
+    <NavLink { ...props } />
+  </button>
+)
 
 class ScheduleForm extends Component {
   constructor(props) {
@@ -26,27 +32,32 @@ class ScheduleForm extends Component {
     this.handleSubmit = this.handleSubmit.bind(this)
     this.createSchedule = this.createSchedule.bind(this)
     this.updateSchedule = this.updateSchedule.bind(this)
-
-    if (!props.location.state) {
-      return
-    }
-    const { schedule_uuid } = props.location.state
-    if (schedule_uuid) {
-      this.state = Object.assign(this.state, this.schedule().toJS())
-    }
   }
 
-  componentWillMount() {
-    schedules.fetch()
+  componentDidMount() {
+    schedules.fetch().then(() => {
+      const schedule = this.schedule()
+
+      if (!schedule) return
+      this.setState(schedule.toJS(), state => {
+        console.log('state is now: ', state, this.state)
+      })
+    })
+  }
+
+  scheduleId() {
+    let scheduleUuid
+    const { match } = this.props
+    if (match && match.params) {
+      scheduleUuid = match.params.schedule_uuid
+    }
+
+    return scheduleUuid
   }
 
   schedule() {
-    const { schedule_uuid } = this.props.location.state
-    const { uuid } = this.state
-    if (!uuid && !schedule_uuid) {
-      return null
-    }
-    const scheduleId = uuid || schedule_uuid
+    const scheduleId = this.scheduleId()
+    if (!scheduleId) return null
     return schedules.find({ uuid: scheduleId })
   }
 
@@ -158,10 +169,7 @@ class ScheduleForm extends Component {
     let schedule
     const { submitted, uuid } = this.state
     if (submitted) {
-      return <Redirect to={{
-                             pathname: '/add_teams',
-                             state: { schedule_uuid: uuid },
-                           }}/>
+      return <Redirect to={{ pathname: `/add_teams/${uuid}` }}/>
     }
 
     if (uuid) {
@@ -228,7 +236,7 @@ class ScheduleForm extends Component {
             onChange={ this.handleInputChange } />
         </label>
         <label>
-          Duration of each game (seconds):
+          Duration of each game (minutes):
           <input
             id='schedule_game_duration'
             type="text"
@@ -239,7 +247,7 @@ class ScheduleForm extends Component {
 
         <input type="submit" value={ submitLabel } />
         {
-          schedule && <Link to={{ pathname: '/add_teams', state: { schedule_uuid: schedule.id } }}>Update Teams</Link>
+          schedule && <WrappedLink to={{ pathname: `/add_teams/${schedule.id}` }}>Update Teams</WrappedLink>
         }
       </form>
     )

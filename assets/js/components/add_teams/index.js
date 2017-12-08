@@ -8,26 +8,26 @@ import Loading from '../loading'
 import Teams from '../teams'
 
 class AddTeams extends Component {
-  constructor(props) {
-    super(props)
-
-    if (!props.location.state) {
-      return
-    }
-    const { schedule_uuid } = props.location.state
-    this.state = { schedule_uuid }
-  }
-
   componentWillMount() {
     schedules.fetch()
   }
 
+  scheduleId() {
+    let schedule_uuid
+    const { match } = this.props
+    if (match && match.params) {
+      schedule_uuid = match.params.schedule_uuid
+    }
+
+    return schedule_uuid
+  }
+
   schedule() {
-    const { schedule_uuid } = this.state
-    if (!schedule_uuid) {
+    const scheduleId = this.scheduleId()
+    if (!scheduleId) {
       return null
     }
-    return schedules.find({ uuid: schedule_uuid })
+    return schedules.find({ uuid: scheduleId })
   }
 
   render() {
@@ -48,7 +48,7 @@ class AddTeams extends Component {
       <div className="Schedule">
         <h3>Add your teams for: {schedule.get('name')}</h3>
         <Teams schedule={ schedule } />
-        <Link to={{ pathname: '/new_schedule', state: { schedule_uuid: schedule.id } }}>Back</Link>
+        <Link to={{ pathname: `/schedule/${schedule.id}` }}>Back</Link>
       </div>
     )
   }

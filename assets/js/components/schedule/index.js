@@ -85,7 +85,7 @@ export default withRouter(observer(class Schedule extends Component {
 
     if (redirectedToShow) {
       return <Redirect to={{
-                             pathname: '/show_schedule',
+                             pathname: `/schedule/${schedule.id}`,
                              state: { schedule_uuid: schedule.id },
                            }}/>
     }
@@ -98,7 +98,7 @@ export default withRouter(observer(class Schedule extends Component {
     return (
       <div className={ className } >
         <span className="name" onClick={ this.redirectToScheduleShow.bind(this) } style={{ cursor: 'pointer' }}>
-          {schedule.get('name')}
+          <strong>{schedule.get('name')}</strong>
         </span>
         &nbsp;
         <span className="competition_type">({schedule.get('competition_type')})</span>

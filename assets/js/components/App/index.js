@@ -27,13 +27,11 @@ apiClient(adapter, {
 
 const Home = () => (
   <section className="box special">
-    <Schedules />
+    <NavLink to="/schedule/new" activeClassName="button">New Schedule</NavLink>
     <header className="major">
-      <h2>New Schedule</h2>
-      <p>Click to create a Schedule</p>
+      <h3>Schedules</h3>
     </header>
-    <NavLink to="/new_schedule" activeClassName="button">New Schedule</NavLink>
-    <span className="image featured"><img src="/static/images/pic01.jpg" alt="" /></span>
+    <Schedules />
   </section>
 )
 
@@ -47,7 +45,7 @@ const NewSchedule = () => (
   </section>
 )
 
-const ShowSchedulePage = () => (
+const SchedulePage = () => (
   <section className="box special">
     <header className="major">
       <ScheduleForm />
@@ -77,9 +75,9 @@ const App = () => (
     <div className="features-row">
       <Switch>
         <Route exact path="/" component={ Home }/>
-        <Route path="/new_schedule" component={ NewSchedule }/>
-        <Route path="/add_teams" component={ AddTeamsPage }/>
-        <Route path="/show_schedule" component={ ShowSchedulePage }/>
+        <Route path="/schedule/new" component={ NewSchedule }/>
+        <Route path="/add_teams/:schedule_uuid" component={ AddTeamsPage }/>
+        <Route path="/schedule/:schedule_uuid" component={ SchedulePage }/>
         <Route path="/matches/:schedule_uuid" component={ MatchesPage }/>
       </Switch>
     </div>
