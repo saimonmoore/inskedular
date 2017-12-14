@@ -19,4 +19,20 @@ defmodule InskedularWeb.TeamController do
       |> render("show.json", team: team)
     end
   end
+
+  def update(conn, team_params) do
+    with {:ok, %Team{} = team} <- Scheduling.update_team(team_params) do
+      conn
+      |> put_status(:ok)
+      |> render("show.json", team: team)
+    end
+  end
+
+  def delete(conn, %{ "id" => team_uuid }) do
+    IO.puts "====> team_patrams: #{inspect(team_uuid)}"
+    with {:ok } <- Scheduling.destroy_team(team_uuid) do
+      conn
+      |> put_status(:ok)
+    end
+  end
 end

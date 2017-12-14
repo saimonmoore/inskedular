@@ -7,7 +7,7 @@ defmodule Inskedular.Scheduling do
 
   import Comb
 
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule,UpdateMatch}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,DestroySchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam}
   alias Inskedular.Scheduling.Projections.{Schedule,Team,Match}
   alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches}
   alias Inskedular.{Repo,Router}
@@ -192,6 +192,17 @@ defmodule Inskedular.Scheduling do
     create_match
   end
 
+  @doc """
+  Destroy a Schedule
+  """
+  def destroy_schedule(uuid) do
+    destroy_schedule = DestroySchedule.new(%{schedule_uuid: uuid})
+
+    with :ok <- Router.dispatch(destroy_schedule, consistency: :strong) do
+      {:ok}
+    end
+  end
+
   defp matches_created(schedule_uuid) do
     %{ schedule_uuid: schedule_uuid }
     |> IncludeMatchesInSchedule.new()
@@ -226,6 +237,34 @@ defmodule Inskedular.Scheduling do
       get(Team, uuid)
     else
       reply -> reply
+    end
+  end
+
+  @doc """
+  Update a Team
+  """
+  def update_team(%{"id" => uuid} = attrs \\ %{}) do
+    update_team = 
+      attrs
+      |> assign(:team_uuid, uuid)
+      |> Map.delete("id")
+      |> UpdateTeam.new
+
+    with :ok <- Router.dispatch(update_team, consistency: :strong) do
+      get(Team, uuid)
+    else
+      reply -> reply
+    end
+  end
+
+  @doc """
+  Destroy a Team
+  """
+  def destroy_team(uuid) do
+    destroy_team = DestroyTeam.new(%{team_uuid: uuid})
+
+    with :ok <- Router.dispatch(destroy_team, consistency: :strong) do
+      {:ok}
     end
   end
 

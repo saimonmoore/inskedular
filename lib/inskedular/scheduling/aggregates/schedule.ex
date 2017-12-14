@@ -12,8 +12,8 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   ]
 
   alias Inskedular.Scheduling.Aggregates.Schedule
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,StartSchedule,IncludeMatchesInSchedule}
-  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleStarted,MatchesCreated}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,DestroySchedule,StartSchedule,IncludeMatchesInSchedule}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleDestroyed,ScheduleStarted,MatchesCreated}
 
   @doc """
   Create a new schedule
@@ -38,6 +38,16 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     %ScheduleStarted{
       schedule_uuid: start.schedule_uuid,
       status: "started",
+    }
+  end
+
+  def execute(%Schedule{status: :deleted}, %DestroySchedule{}) do
+    {:error, :already_deleted}
+  end
+
+  def execute(%Schedule{}, %DestroySchedule{} = destroy) do
+    %ScheduleDestroyed{
+      schedule_uuid: destroy.schedule_uuid,
     }
   end
 
@@ -78,5 +88,9 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
       uuid: started.schedule_uuid,
       status: started.status,
     }
+  end
+
+  def apply(%Schedule{} = schedule, %ScheduleDestroyed{}) do
+    %Schedule{schedule | status: :deleted }
   end
 end

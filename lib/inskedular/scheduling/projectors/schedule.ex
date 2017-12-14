@@ -3,7 +3,7 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
                                   consistency: :strong
   use Inskedular.Support.Casting
 
-  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleStarted,MatchesCreated}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleDestroyed,ScheduleStarted,MatchesCreated}
   alias Inskedular.Scheduling.Projections.Schedule
 
   project %ScheduleCreated{} = created do
@@ -26,6 +26,11 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
     Ecto.Multi.update_all(multi, :schedule, schedule_query(started.schedule_uuid), set: [
       status: started.status,
     ])
+  end
+
+  project %ScheduleDestroyed{} = destroyed do
+    IO.puts "[Projector.Schedule#project destroyed] =======> destroyed: #{inspect(destroyed)} "
+    Ecto.Multi.delete_all(multi, :schedule, schedule_query(destroyed.schedule_uuid))
   end
 
   project %MatchesCreated{} = created do

@@ -26,11 +26,22 @@ class Teams extends Component {
     const { schedule } = this.props
     return (
       <div className='Teams'>
+        <table>
+          <thead>
+            <tr>
+              <td>Number</td>
+              <td>Name</td>
+              <td>Action</td>
+            </tr>
+          </thead>
+          <tbody>
         {
-          teams.models.map(team => (
-            <Team key={ team.id } team={ team } />
+          teams.models.map((team, index) => (
+            <Team key={ team.id } team={ team } index={ index } schedule={ schedule } />
           ))
         }
+          </tbody>
+        </table>
         <TeamForm schedule ={ schedule } teams={ teams } />
       </div>
     )
