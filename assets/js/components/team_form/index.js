@@ -26,6 +26,10 @@ export default observer(class TeamForm extends Component {
     this.setState({ error: null })
   }
 
+  focusOnForm() {
+    document.getElementById('team-form').focus()
+  }
+
   render() {
     const { teams } = this.props
     const { error } = this.state
@@ -38,12 +42,13 @@ export default observer(class TeamForm extends Component {
       return <div className='FormSaving'>Saving team...</div>
     }
 
+    setTimeout(this.focusOnForm, 200)
     return (
       <form onSubmit={ this.onSubmit.bind(this) } className='TeamForm'>
         <label className='Form__Label'>
 
           <span>Name</span>
-          <input className='Form__Textarea' onChange={ this.onChange.bind(this) } type='text' />
+          <input id='team-form' className='Form__Textarea' onChange={ this.onChange.bind(this) } type='text' tabIndex="-1" />
         </label>
         <button className='Form__Submit' type='submit'>Add</button>
       </form>
