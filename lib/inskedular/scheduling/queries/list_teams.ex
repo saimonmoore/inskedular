@@ -23,7 +23,7 @@ defmodule Inskedular.Scheduling.Queries.ListTeams do
   defp query(options) do
     from(s in Team)
     |> filter_by_schedule(options)
-    |> order_by([a], desc: a.inserted_at)
+    |> order_by([a], asc: a.inserted_at)
   end
 
   defp filter_by_schedule(query, %Options{schedule_uuid: nil}), do: query
