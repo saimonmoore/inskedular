@@ -29,10 +29,8 @@ defmodule InskedularWeb.TeamController do
   end
 
   def delete(conn, %{ "id" => team_uuid }) do
-    IO.puts "====> team_patrams: #{inspect(team_uuid)}"
-    with {:ok } <- Scheduling.destroy_team(team_uuid) do
-      conn
-      |> put_status(:ok)
+    with :ok <- Scheduling.destroy_team(team_uuid) do
+      send_resp(conn, :ok, "{}")
     end
   end
 end

@@ -1,4 +1,4 @@
-defmodule Inskedular.Scheduling.Agregates.ScheduleLifespan do
+defmodule Inskedular.Scheduling.Aggregates.ScheduleLifespan do
   @behaviour Commanded.Aggregates.AggregateLifespan
 
   alias Inskedular.Scheduling.Commands.DestroySchedule

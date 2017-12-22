@@ -264,7 +264,7 @@ defmodule Inskedular.Scheduling do
     destroy_team = DestroyTeam.new(%{team_uuid: uuid})
 
     with :ok <- Router.dispatch(destroy_team, consistency: :strong) do
-      {:ok}
+      :ok
     end
   end
 
