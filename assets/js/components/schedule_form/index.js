@@ -173,6 +173,7 @@ class ScheduleForm extends Component {
         <label>
           Competition Type:
           <select
+            disabled
             id='schedule_competition_type'
             name='competitionType'
             value={ this.state.competition_type }
@@ -182,19 +183,19 @@ class ScheduleForm extends Component {
           </select>
         </label>
         <label>
-          Starting on:
+          {/* Starting on: */}
           <input
             id='schedule_start_date'
             name='start_date'
-            type="text"
+            type="hidden"
             value={ this.state.start_date }
             onChange={ this.handleInputChange } />
         </label>
         <label>
-          Ending on:
+          {/* Ending on: */}
           <input
             id='schedule_end_date'
-            type="text"
+            type="hidden"
             name='end_date'
             value={ this.state.end_date }
             onChange={ this.handleInputChange } />
@@ -209,19 +210,19 @@ class ScheduleForm extends Component {
             onChange={ this.handleInputChange } />
         </label>
         <label>
-          Number of weeks:
+          {/* Number of weeks: */}
           <input
             id='schedule_number_of_weeks'
             name='number_of_weeks'
-            type="text"
+            type="hidden"
             value={ this.state.number_of_weeks }
             onChange={ this.handleInputChange } />
         </label>
         <label>
-          Duration of each game (minutes):
+          {/* Duration of each game (minutes): */}
           <input
             id='schedule_game_duration'
-            type="text"
+            type="hidden"
             name='game_duration'
             value={ this.state.game_duration }
             onChange={ this.handleInputChange } />
