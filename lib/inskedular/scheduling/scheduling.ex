@@ -7,7 +7,7 @@ defmodule Inskedular.Scheduling do
 
   import Comb
 
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,DestroySchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam}
   alias Inskedular.Scheduling.Projections.{Schedule,Team,Match}
   alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches}
   alias Inskedular.{Repo,Router}
@@ -55,6 +55,23 @@ defmodule Inskedular.Scheduling do
     end
   end
 
+  @doc """
+  Update a Schedule
+  """
+  def update_schedule(%{"id" => uuid} = attrs \\ %{}) do
+    update_schedule = 
+      attrs
+      |> cast_schedule_attributes
+      |> assign(:schedule_uuid, uuid)
+      |> Map.delete("id")
+      |> UpdateSchedule.new
+
+    with :ok <- Router.dispatch(update_schedule, consistency: :strong) do
+      get(Schedule, uuid)
+    else
+      reply -> reply
+    end
+  end
 
   @doc """
   Get an existing schedule by the name, or return `nil` if not present
@@ -101,7 +118,6 @@ defmodule Inskedular.Scheduling do
   end
 
   def create_matches(%{schedule_uuid: schedule_uuid, round_number: round_number}) do
-    IO.puts "[Scheduling#create_matches] =======> id: #{schedule_uuid}"
     {:ok, %Schedule{competition_type: competition_type} = schedule} = get(Schedule, schedule_uuid)
     commands = case String.to_atom(competition_type) do
       :league -> create_league_matches(%{schedule: schedule, round_number: round_number})
@@ -117,15 +133,11 @@ defmodule Inskedular.Scheduling do
 
   # TODO: Calculate proper league combinations
   defp create_league_matches(%{schedule: schedule, round_number: round_number}) do
-    IO.puts "[Scheduling#create_league_matches] =======> id: #{schedule.uuid}"
-    IO.puts "[Scheduling#create_league_matches] =======> schedule: #{inspect(schedule)}"
     teams = list_teams(%{"schedule_uuid" => schedule.uuid})
-    IO.puts "[Scheduling#create_league_matches] =======> teams: #{length(teams)}"
 
     calculate_league_matches(schedule, teams, round_number)
     |> Enum.map(
       fn(match) ->
-        IO.puts "[Scheduling#create_league_matches] =======> match: #{inspect(match)}"
         create_match(match)
       end
     )
@@ -143,10 +155,8 @@ defmodule Inskedular.Scheduling do
   end
 
   defp calculate_league_matches(schedule, teams, _round_number) do
-    IO.puts "[Scheduling#calculate_league_matches] =======>"
     teams
     |> Enum.map(fn(team) -> 
-      IO.puts "[Scheduling#calculate_league_matches] =======> #{inspect(team)} uuid: #{team.uuid}"
       team.uuid
     end)
     |> combinations(2)
@@ -169,7 +179,6 @@ defmodule Inskedular.Scheduling do
   end
 
   defp create_match(%{schedule_uuid: schedule_uuid, local_team_uuid: local_team_uuid, away_team_uuid: away_team_uuid, match_number: match_number, start_date: start_date, end_date: end_date }) do
-    IO.puts "[Scheduling#create_match] =======> "
     match_uuid = UUID.uuid4()
 
     create_match = %{
@@ -183,12 +192,6 @@ defmodule Inskedular.Scheduling do
     |> assign(:match_uuid, match_uuid)
     |> CreateMatch.new()
 
-    IO.puts "[Scheduling#create_match] =======> COMMAND: #{inspect(create_match)} "
-    # with :ok <- Router.dispatch(create_match) do
-    #   {:ok}
-    # else
-    #   reply -> reply
-    # end
     create_match
   end
 

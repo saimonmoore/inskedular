@@ -12,8 +12,8 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   ]
 
   alias Inskedular.Scheduling.Aggregates.Schedule
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,DestroySchedule,StartSchedule,IncludeMatchesInSchedule}
-  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleDestroyed,ScheduleStarted,MatchesCreated}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,IncludeMatchesInSchedule}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,MatchesCreated}
 
   @doc """
   Create a new schedule
@@ -28,6 +28,22 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
       number_of_weeks: create.number_of_weeks,
       game_duration: create.game_duration,
       competition_type: create.competition_type,
+    }
+  end
+
+  @doc """
+  Update a new schedule
+  """
+  def execute(%Schedule{}, %UpdateSchedule{} = update) do
+    %ScheduleUpdated{
+      schedule_uuid: update.schedule_uuid,
+      name: update.name,
+      start_date: update.start_date,
+      end_date: update.end_date,
+      number_of_games: update.number_of_games,
+      number_of_weeks: update.number_of_weeks,
+      game_duration: update.game_duration,
+      competition_type: update.competition_type,
     }
   end
 
@@ -73,6 +89,18 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
       number_of_games: created.number_of_games,
       number_of_weeks: created.number_of_weeks,
       game_duration: created.game_duration
+    }
+  end
+
+  def apply(%Schedule{} = schedule, %ScheduleUpdated{} = updated) do
+    %Schedule{schedule |
+      name: updated.name,
+      competition_type: updated.competition_type,
+      start_date: updated.start_date,
+      end_date: updated.end_date,
+      number_of_games: updated.number_of_games,
+      number_of_weeks: updated.number_of_weeks,
+      game_duration: updated.game_duration
     }
   end
 

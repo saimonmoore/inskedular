@@ -37,7 +37,7 @@ class Teams extends Component {
           <tbody>
         {
           teams.models.map((team, index) => (
-            <Team key={ team.id } team={ team } index={ index } schedule={ schedule } />
+            <Team key={ team.id } team={ team } index={ index + 1 } schedule={ schedule } />
           ))
         }
           </tbody>

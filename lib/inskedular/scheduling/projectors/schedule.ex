@@ -3,7 +3,7 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
                                   consistency: :strong
   use Inskedular.Support.Casting
 
-  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleDestroyed,ScheduleStarted,MatchesCreated}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,MatchesCreated}
   alias Inskedular.Scheduling.Projections.Schedule
 
   project %ScheduleCreated{} = created do
@@ -22,6 +22,21 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
     })
   end
 
+  project %ScheduleUpdated{} = updated do
+    {:ok, start_date} = cast_datetime(updated.start_date)
+    {:ok, end_date} = cast_datetime(updated.end_date)
+
+    Ecto.Multi.update_all(multi, :schedule, schedule_query(updated.schedule_uuid), set: [
+      name: updated.name,
+      competition_type: updated.competition_type,
+      start_date: start_date,
+      end_date: end_date,
+      number_of_games: updated.number_of_games,
+      number_of_weeks: updated.number_of_weeks,
+      game_duration: updated.game_duration
+    ])
+  end
+
   project %ScheduleStarted{} = started do
     Ecto.Multi.update_all(multi, :schedule, schedule_query(started.schedule_uuid), set: [
       status: started.status,
@@ -29,7 +44,6 @@ defmodule Inskedular.Scheduling.Projectors.Schedule do
   end
 
   project %ScheduleDestroyed{} = destroyed do
-    IO.puts "[Projector.Schedule#project destroyed] =======> destroyed: #{inspect(destroyed)} "
     Ecto.Multi.delete_all(multi, :schedule, schedule_query(destroyed.schedule_uuid))
   end
 

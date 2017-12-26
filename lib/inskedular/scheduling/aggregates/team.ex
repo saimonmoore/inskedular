@@ -50,7 +50,6 @@ defmodule Inskedular.Scheduling.Aggregates.Team do
 
   def apply(%Team{} = team, %TeamUpdated{} = updated) do
     %Team{team |
-      uuid: updated.team_uuid,
       name: updated.name,
     }
   end

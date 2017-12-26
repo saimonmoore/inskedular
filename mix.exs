@@ -23,7 +23,7 @@ defmodule Inskedular.Mixfile do
       extra_applications: [
         :logger,
         :runtime_tools,
-        :eventstore
+        :eventstore,
       ]
     ]
   end

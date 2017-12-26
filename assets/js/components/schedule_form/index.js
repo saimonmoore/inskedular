@@ -21,11 +21,11 @@ class ScheduleForm extends Component {
       submitted: false,
       name: '',
       competition_type: 'league',
-      numberOfGames: 4,
-      numberOfWeeks: 1,
-      gameDuration: 60,
-      startDate: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
-      endDate: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
+      number_of_games: 4,
+      number_of_weeks: 1,
+      game_duration: 60,
+      start_date: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
+      end_date: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),
     }
 
     this.handleInputChange = this.handleInputChange.bind(this)
@@ -97,35 +97,37 @@ class ScheduleForm extends Component {
     const schedule = this.schedule()
     const {
       name,
-      competitionType,
-      numberOfGames,
-      numberOfWeeks,
-      gameDuration,
-      startDate,
-      endDate,
+      competition_type,
+      number_of_games,
+      number_of_weeks,
+      game_duration,
+      start_date,
+      end_date,
     } = this.state.form
 
     return schedule.save({
       name,
-      competition_type: competitionType,
-      number_of_games: numberOfGames,
-      number_of_weeks: numberOfWeeks,
-      game_duration: gameDuration,
-      start_date: startDate,
-      end_date: endDate,
+      competition_type,
+      number_of_games,
+      number_of_weeks,
+      game_duration,
+      start_date,
+      end_date,
     }, { optimistic: false })
   }
 
   createOrUpdateSchedule() {
     let schedule
     const { uuid } = this.state
+    const moreState = { submitted: true }
 
     if (uuid) {
       schedule = this.schedule()
+      moreState.submitted = false
     }
     const promise = schedule ? this.updateSchedule() : this.createSchedule()
     promise.then(json => {
-      this.setState({ submitted: true, uuid: json.uuid })
+      this.setState({ ...moreState, uuid: json.uuid })
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
     })
@@ -203,9 +205,9 @@ class ScheduleForm extends Component {
           Starting on:
           <input
             id='schedule_start_date'
-            name='startDate'
+            name='start_date'
             type="text"
-            value={ this.state.startDate }
+            value={ this.state.start_date }
             onChange={ this.handleInputChange } />
         </label>
         <label>
@@ -213,26 +215,26 @@ class ScheduleForm extends Component {
           <input
             id='schedule_end_date'
             type="text"
-            name='endDate'
-            value={ this.state.endDate }
+            name='end_date'
+            value={ this.state.end_date }
             onChange={ this.handleInputChange } />
         </label>
         <label>
           Number of games:
           <input
             id='schedule_number_of_games'
-            name='numberOfGames'
+            name='number_of_games'
             type="text"
-            value={ this.state.numberOfGames }
+            value={ this.state.number_of_games }
             onChange={ this.handleInputChange } />
         </label>
         <label>
           Number of weeks:
           <input
             id='schedule_number_of_weeks'
-            name='numberOfWeeks'
+            name='number_of_weeks'
             type="text"
-            value={ this.state.numberOfWeeks }
+            value={ this.state.number_of_weeks }
             onChange={ this.handleInputChange } />
         </label>
         <label>
@@ -240,8 +242,8 @@ class ScheduleForm extends Component {
           <input
             id='schedule_game_duration'
             type="text"
-            name='gameDuration'
-            value={ this.state.gameDuration }
+            name='game_duration'
+            value={ this.state.game_duration }
             onChange={ this.handleInputChange } />
         </label>
 
