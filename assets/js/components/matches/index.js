@@ -10,6 +10,16 @@ import Loading from '../loading'
 import Match from '../Match'
 
 class Matches extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      filter: 'all',
+    }
+
+    this.filterPlayer = this.filterPlayer.bind(this)
+  }
+
   componentWillMount() {
     const schedule_uuid = this.scheduleId()
     if (schedule_uuid) {
@@ -34,6 +44,16 @@ class Matches extends Component {
     return schedules.get(schedule_uuid)
   }
 
+  filterPlayer(event) {
+    const filter = event.target.value
+    this.setState({ filter })
+  }
+
+  filterMatch(match, filter) {
+    if (filter === 'all') return true
+    return match.get('local_team_uuid') == filter || match.get('away_team_uuid') === filter
+  }
+
   render() {
     if (matches.isRequest('fetching')) {
       return <Loading label='matches' />
@@ -56,10 +76,20 @@ class Matches extends Component {
     }
 
     const schedule = this.schedule()
+    const filter = this.state.filter
 
     return (
       <div className='Matches'>
         <h3>Matches for { schedule.get('name') }</h3>
+        <span>Filter for: </span>
+        <select id='filterPlayer' onChange={this.filterPlayer}>
+          <option value="all">All players</option>
+          {
+            teams.models.map(team => (
+              <option value="all" value={team.id} key={team.get('name')}>{team.get('name')}</option>
+            ))
+          }
+        </select>
         <table>
           <thead>
             <tr>
@@ -74,7 +104,7 @@ class Matches extends Component {
           <tbody>
         {
           matches.models.map(match => (
-            <Match key={ match.id } match={ match } schedule={ schedule } teams={ teams } />
+            this.filterMatch(match, filter) && <Match key={ match.id } match={ match } schedule={ schedule } teams={ teams } />
           ))
         }
           </tbody>
