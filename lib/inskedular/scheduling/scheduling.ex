@@ -89,17 +89,21 @@ defmodule Inskedular.Scheduling do
     "start_date" => start_date_string,
     "end_date" => end_date_string,
   } = attrs) do
-
     {:ok, start_date} = cast_datetime(start_date_string)
     {:ok, end_date} = cast_datetime(end_date_string)
 
     %{attrs |
-      "number_of_games" => String.to_integer(number_of_games),
-      "number_of_weeks" => String.to_integer(number_of_weeks),
-      "game_duration" => String.to_integer(game_duration),
+      "number_of_games" => cast_integer_attribute(number_of_games),
+      "number_of_weeks" => cast_integer_attribute(number_of_weeks),
+      "game_duration" => cast_integer_attribute(game_duration),
       "start_date" => start_date,
       "end_date" => end_date,
     }
+  end
+
+  def cast_integer_attribute(attr) when is_integer(attr), do: attr
+  def cast_integer_attribute(attr) when is_binary(attr) do
+    String.to_integer(attr)
   end
 
   defp stop_schedule(_schedule_uuid) do

@@ -74,22 +74,22 @@ class ScheduleForm extends Component {
   createSchedule() {
     const {
       name,
-      competitionType,
-      numberOfGames,
-      numberOfWeeks,
-      gameDuration,
-      startDate,
-      endDate,
-    } = this.state.form
+      competition_type,
+      number_of_games,
+      number_of_weeks,
+      game_duration,
+      start_date,
+      end_date,
+    } = this.state
 
     return schedules.create({
       name,
-      competition_type: competitionType,
-      number_of_games: numberOfGames,
-      number_of_weeks: numberOfWeeks,
-      game_duration: gameDuration,
-      start_date: startDate,
-      end_date: endDate,
+      competition_type,
+      number_of_games,
+      number_of_weeks,
+      game_duration,
+      start_date,
+      end_date,
     }, { optimistic: false })
   }
 
@@ -103,7 +103,7 @@ class ScheduleForm extends Component {
       game_duration,
       start_date,
       end_date,
-    } = this.state.form
+    } = this.state
 
     return schedule.save({
       name,
@@ -128,19 +128,11 @@ class ScheduleForm extends Component {
     const promise = schedule ? this.updateSchedule() : this.createSchedule()
     promise.then(json => {
       this.setState({ ...moreState, uuid: json.uuid })
+
+      if (!uuid) this.resetForm()
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
     })
-  }
-
-  inputNodes() {
-    return document.querySelectorAll(`input#schedule_name,
-                                    select#schedule_competition_type,
-                                    input#schedule_start_date,
-                                    input#schedule_end_date,
-                                    input#schedule_number_of_games,
-                                    input#schedule_number_of_weeks,
-                                    input#schedule_game_duration`)
   }
 
   resetForm() {
@@ -151,19 +143,7 @@ class ScheduleForm extends Component {
   }
 
   handleSubmit(event) {
-    const nodes = this.inputNodes()
-    const form = {}
-    nodes.forEach(node => {
-      form[node.name] = node.value
-    })
-
-    const data = {
-      form,
-    }
-    this.setState(data, () => {
-      this.createOrUpdateSchedule()
-      this.resetForm()
-    })
+    this.createOrUpdateSchedule()
     event.preventDefault()
   }
 

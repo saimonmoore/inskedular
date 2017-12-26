@@ -10,8 +10,6 @@ defmodule Inskedular.Scheduling.Commands.UpdateMatch do
   use ExConstructor
   use Vex.Struct
 
-  alias Inskedular.Scheduling.Commands.UpdateMatch
-
   validates :match_uuid, uuid: true
   validates :status, presence: [message: "can't be empty"], string: true
   validates :result, presence: [message: "can't be empty"], string: true

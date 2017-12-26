@@ -6,6 +6,12 @@ defmodule Inskedular.Support.Presenting do
       end
       def present_datetime(date_time) do
         %DateTime{day: day, month: month, year: year, hour: hour, minute: minute, second: second} = date_time
+        # "#{pad_int(day)}-#{pad_int(month)}-#{pad_int(year)} #{pad_int(hour)}:#{pad_int(minute)}:#{pad_int(second)}"
+        date_time |> DateTime.to_iso8601()
+      end
+
+      def present_datetime_human(date_time) do
+        %DateTime{day: day, month: month, year: year, hour: hour, minute: minute, second: second} = date_time
         "#{pad_int(day)}-#{pad_int(month)}-#{pad_int(year)} #{pad_int(hour)}:#{pad_int(minute)}:#{pad_int(second)}"
       end
 
