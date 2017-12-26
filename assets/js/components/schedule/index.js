@@ -7,6 +7,8 @@ export default withRouter(observer(class Schedule extends Component {
     super(props)
     this.state = {
       redirectedToShow: false,
+      polling: false,
+      poller: false,
     }
   }
 
@@ -21,20 +23,18 @@ export default withRouter(observer(class Schedule extends Component {
 
   pollForRunning() {
     const poller = setInterval(this.pollStatus.bind(this), 2000)
-    this.setState(poller)
+    this.setState({ poller, polling: true })
   }
 
   pollStatus() {
     const { schedule } = this.props
-    const { poller } = this.state
+    const { poller, polling } = this.state
     const promise = schedule.fetch()
 
     promise.then(() => {
-      if (schedule.get('status') === 'running') {
+      if (!polling || schedule.get('status') === 'running') {
         clearInterval(poller)
-        this.setState({ poller: false })
-      } else {
-        this.setState({ poller })
+        this.setState({ polling: false })
       }
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
@@ -51,6 +51,7 @@ export default withRouter(observer(class Schedule extends Component {
 
     promise.then(json => {
       this.setState({ uuid: schedule.id })
+      this.pollForRunning()
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
     })
@@ -77,7 +78,7 @@ export default withRouter(observer(class Schedule extends Component {
   }
 
   render() {
-    const { redirectedToShow } = this.state
+    const { redirectedToShow, polling } = this.state
     const { schedule } = this.props
     const isRunning = schedule.get('status') === 'running'
 
@@ -102,11 +103,16 @@ export default withRouter(observer(class Schedule extends Component {
         <span className="competition_type">({schedule.get('competition_type')})</span>
         &nbsp;
         <span className="games">
-          {schedule.get('number_of_games')} games in {schedule.get('number_of_weeks')} weeks
+          {schedule.get('number_of_games')} games
         </span>
         &nbsp;
         <span className="status">
-          <strong>{schedule.get('status').toUpperCase()}</strong>
+          {
+            polling ?
+              <strong>Starting...</strong>
+              :
+              <strong>{schedule.get('status').toUpperCase()}</strong>
+          }
         </span>
         &nbsp;
         <span className="actions">

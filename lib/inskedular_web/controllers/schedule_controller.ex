@@ -11,6 +11,11 @@ defmodule InskedularWeb.ScheduleController do
     render(conn, "index.json", schedules: schedules)
   end
 
+  def show(conn, %{"id" => schedule_uuid}) do
+    schedule = Scheduling.schedule_by_uuid(schedule_uuid)
+    render(conn, "show.json", schedule: schedule)
+  end
+
   def create(conn, schedule_params) do
     with {:ok, %Schedule{} = schedule} <- Scheduling.create_schedule(schedule_params) do
       conn

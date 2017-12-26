@@ -17,6 +17,13 @@ defmodule Inskedular.Scheduling do
   #
 
   @doc """
+  Get a single schedule by their UUID
+  """
+  def schedule_by_uuid(uuid) when is_binary(uuid) do
+    Repo.get(Schedule, uuid)
+  end
+
+  @doc """
   Returns most recent schedules globally by default.
   """
   @spec list_schedules(params :: map()) :: {schedules :: list(Schedule.t), schedule_count :: non_neg_integer()}
