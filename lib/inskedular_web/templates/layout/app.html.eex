@@ -14,7 +14,7 @@
 
 			<!-- Header -->
 				<header id="header" class="alt">
-					<h1><a href="index.html">Inskedular</a> brought to you by Xing Hack Week</h1>
+					<h1><a href="/">Inskedular</a> brought to you by Xing Hack Week</h1>
 					<nav id="nav">
 						<ul>
 							<li><a href="/">Home</a></li>
@@ -26,7 +26,7 @@
 			<!-- Banner -->
 				<section id="banner">
 					<h2>Inskedular</h2>
-					<p>Schedule with ease!</p>
+					<p>Simple League Tracking</p>
 				</section>
 
 			<!-- Main -->
