@@ -48,10 +48,8 @@ export default withRouter(observer(class Schedule extends Component {
     const { schedule } = this.props
 
     const promise = schedule.rpc('status', { status: 'start' })
-    // const promise = schedule.rpc(`status/${schedule.id}`, { status: 'start' }, { method: 'put' })
 
     promise.then(json => {
-      console.dir(json)
       this.setState({ uuid: schedule.id })
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
@@ -59,7 +57,7 @@ export default withRouter(observer(class Schedule extends Component {
   }
 
   doNothing(event) {
-    event.preventDefault();
+    event && event.preventDefault();
   }
 
   redirectToScheduleShow() {
@@ -119,8 +117,11 @@ export default withRouter(observer(class Schedule extends Component {
         &nbsp;
         {
           isRunning &&
-            <Link to={{ pathname: `/matches/${schedule.id}`, state: { schedule_uuid: schedule.id } }}>Matches</Link>
-        }
+            <span>
+              <Link to={{ pathname: `/matches/${schedule.id}`, state: { schedule_uuid: schedule.id } }} style={{ marginRight: '5px' }}>Matches</Link>
+              <Link to={{ pathname: `/stats/${schedule.id}`, state: { schedule_uuid: schedule.id } }}>Stats</Link>
+            </span>
+          }
       </div>
     )
   }

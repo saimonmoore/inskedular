@@ -14,6 +14,7 @@ import ScheduleForm from '../schedule_form'
 import Schedules from '../schedules'
 import AddTeams from '../add_teams'
 import Matches from '../matches'
+import Stats from '../stats'
 
 // Initialize mob-rest API adapter
 apiClient(adapter, {
@@ -70,6 +71,14 @@ const MatchesPage = () => (
   </section>
 )
 
+const StatsPage = () => (
+  <section className="box special">
+    <header className="major">
+      <Stats />
+    </header>
+  </section>
+)
+
 const App = () => (
   <Router>
     <div className="features-row">
@@ -79,6 +88,7 @@ const App = () => (
         <Route path="/add_teams/:schedule_uuid" component={ AddTeamsPage }/>
         <Route path="/schedule/:schedule_uuid" component={ SchedulePage }/>
         <Route path="/matches/:schedule_uuid" component={ MatchesPage }/>
+        <Route path="/stats/:schedule_uuid" component={ StatsPage }/>
       </Switch>
     </div>
   </Router>
