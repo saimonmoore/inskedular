@@ -21,7 +21,7 @@ class ScheduleForm extends Component {
       submitted: false,
       name: '',
       competition_type: 'league',
-      number_of_games: 4,
+      number_of_games: 1,
       number_of_weeks: 1,
       game_duration: 60,
       start_date: moment().format('YYYY-MM-DDTHH:mm:ss\\.SSSSSSZ'),

@@ -165,12 +165,16 @@ defmodule Inskedular.Scheduling do
     )
   end
 
-  defp calculate_league_matches(schedule, teams, _round_number) do
+  def calculate_league_matches(schedule, teams, _round_number) do
     teams
     |> Enum.map(fn(team) -> 
       team.uuid
     end)
     |> combinations(2)
+    |> List.duplicate(schedule.number_of_games) # duplicate x times
+    |> Enum.reverse # inverse order
+    |> Enum.map_every(2, fn(list) -> Enum.map(list, fn(combination) -> Enum.reverse(combination) end) end) # reverse pairs every two matches
+    |> Enum.reduce([], fn(x, acc) -> Enum.into(x, acc) end) # Flatten 1 level
     |> Enum.with_index
     |> Enum.map(fn(combination) ->
       {pair, index} = combination
