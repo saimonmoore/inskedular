@@ -15,5 +15,7 @@ erl_crash.dump
 # variables.
 #/config/*.secret.exs
 
+/priv/static
+
 # Webpack
 assets/node_modules/
