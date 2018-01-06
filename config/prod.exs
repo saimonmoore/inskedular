@@ -15,8 +15,12 @@ use Mix.Config
 # which you typically run after static files are built.
 config :inskedular, InskedularWeb.Endpoint,
   load_from_system_env: true,
-  url: [host: "example.com", port: 80],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  http: [port: {:system, "PORT"}],
+  url: [host: {:system, "HOSTNAME"}, port: {:system, "PORT"}], # This is critical for ensuring web-sockets properly authorize.
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  server: true,
+  root: ".",
+  version: Application.spec(:inskedular, :vsn)
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -58,6 +62,8 @@ config :logger, level: :info
 #
 #     config :inskedular, InskedularWeb.Endpoint, server: true
 #
+
+config :inskedular, :environment, :production
 
 # Finally import the config/prod.secret.exs
 # which should be versioned separately.

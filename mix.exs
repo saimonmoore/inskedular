@@ -55,6 +55,7 @@ defmodule Inskedular.Mixfile do
       {:comb, git: "https://github.com/tallakt/comb.git", branch: "master"},
       {:mix_test_watch, "~> 0.5", only: :dev, runtime: false},
       {:ex_machina, "~> 2.1", only: :test},
+      {:distillery, "~> 1.5", runtime: false},
     ]
   end
 

@@ -2,7 +2,7 @@ defmodule InskedularWeb.LayoutView do
   use InskedularWeb, :view
 
   def js_script_tag(path) do
-    if Mix.env == :prod do
+    if Application.get_env(:inskedular, :environment) == :production do
       # In production we'll just reference the file
       "<script src=\"/js/#{path}\"></script>"
     else
@@ -12,7 +12,7 @@ defmodule InskedularWeb.LayoutView do
   end
 
   def css_link_tag(path) do
-    if Mix.env == :prod do
+    if Application.get_env(:inskedular, :environment) == :production do
       "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/#{path}\" />"
     else
       "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://localhost:8080/css/#{path}\" />"

@@ -77,3 +77,4 @@ config :eventstore, EventStore.Storage,
   hostname: "localhost",
   pool_size: 10
 
+config :inskedular, :environment, :development

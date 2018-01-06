@@ -6,6 +6,8 @@ config :inskedular, InskedularWeb.Endpoint,
   http: [port: 4001],
   server: false
 
+config :inskedular, :environment, :test
+
 # Print only warnings and errors during test
 config :logger, level: :debug
 
