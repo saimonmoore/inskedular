@@ -7,7 +7,7 @@ import matches from '../../stores/matches'
 import schedules from '../../stores/schedules'
 import teams from '../../stores/teams'
 import Loading from '../loading'
-import Match from '../Match'
+import Match from '../match'
 
 class Matches extends Component {
   constructor(props) {

@@ -4,7 +4,7 @@ import React, { Component } from 'react' // eslint-disable-line no-unused-vars
 import { observer } from 'mobx-react'
 import schedules from '../../stores/schedules'
 import Loading from '../loading'
-import Schedule from '../Schedule'
+import Schedule from '../schedule'
 
 class Schedules extends Component {
   componentWillMount() {
