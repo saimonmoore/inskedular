@@ -22,6 +22,7 @@ defmodule Inskedular.Scheduling.Queries.ListSchedules do
   end
 
   defp query(_options) do
-    from s in Schedule
+    from s in Schedule,
+    where: fragment("status != 'deleted'")
   end
 end

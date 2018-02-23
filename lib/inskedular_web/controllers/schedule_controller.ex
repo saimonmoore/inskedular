@@ -41,7 +41,7 @@ defmodule InskedularWeb.ScheduleController do
   end
 
   def delete(conn, %{"id" => team_uuid}) do
-    with {:ok } <- Scheduling.destroy_team(team_uuid) do
+    with {:ok } <- Scheduling.destroy_schedule(team_uuid) do
       conn
       |> put_status(:ok)
     end

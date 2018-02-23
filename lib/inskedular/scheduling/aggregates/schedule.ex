@@ -12,8 +12,8 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   ]
 
   alias Inskedular.Scheduling.Aggregates.Schedule
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,IncludeMatchesInSchedule}
-  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,MatchesCreated}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,IncludeMatchesInSchedule}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,ScheduleRestarted,ScheduleStopped,MatchesCreated}
 
   @doc """
   Create a new schedule
@@ -50,20 +50,52 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   @doc """
   Trigger start of schedule (Will create all the first round matches)
   """
-  def execute(%Schedule{}, %StartSchedule{} = start) do
+  def execute(%Schedule{status: nil}, %StartSchedule{} = start) do
     %ScheduleStarted{
       schedule_uuid: start.schedule_uuid,
       status: "started",
     }
   end
 
-  def execute(%Schedule{status: :deleted}, %DestroySchedule{}) do
+  def execute(%Schedule{status: "running"}, %StartSchedule{}) do
+    {:error, :already_started}
+  end
+
+  @doc """
+  Trigger stop of schedule (Willjust change status of Schedule)
+  """
+  def execute(%Schedule{status: "running"}, %StopSchedule{} = stop) do
+    %ScheduleStopped{
+      schedule_uuid: stop.schedule_uuid,
+      status: "stopped",
+    }
+  end
+
+  def execute(%Schedule{status: "stopped"}, %StopSchedule{}) do
+    {:error, :already_inactive}
+  end
+
+  @doc """
+  Trigger restart of schedule (Will delete all matches and create all the first round matches)
+  """
+  def execute(%Schedule{status: "stopped"}, %RestartSchedule{} = restart) do
+    %ScheduleRestarted{
+      schedule_uuid: restart.schedule_uuid,
+      status: "running",
+    }
+  end
+
+  def execute(%Schedule{status: "deleted"}, %DestroySchedule{}) do
     {:error, :already_deleted}
   end
 
+  @doc """
+  Trigger start of schedule (Will create all the first round matches)
+  """
   def execute(%Schedule{}, %DestroySchedule{} = destroy) do
     %ScheduleDestroyed{
       schedule_uuid: destroy.schedule_uuid,
+      status: "deleted",
     }
   end
 
@@ -118,7 +150,24 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     }
   end
 
-  def apply(%Schedule{} = schedule, %ScheduleDestroyed{}) do
-    %Schedule{schedule | status: :deleted }
+  def apply(%Schedule{} = schedule, %ScheduleRestarted{} = restarted) do
+    %Schedule{schedule |
+      uuid: restarted.schedule_uuid,
+      status: restarted.status,
+    }
+  end
+
+  def apply(%Schedule{} = schedule, %ScheduleStopped{} = stopped) do
+    %Schedule{schedule |
+      uuid: stopped.schedule_uuid,
+      status: stopped.status,
+    }
+  end
+
+  def apply(%Schedule{} = schedule, %ScheduleDestroyed{} = destroyed) do
+    %Schedule{schedule |
+      uuid: destroyed.schedule_uuid,
+      status: :deleted
+    }
   end
 end

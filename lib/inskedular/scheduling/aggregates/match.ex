@@ -14,8 +14,8 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
   ]
 
   alias Inskedular.Scheduling.Aggregates.Match
-  alias Inskedular.Scheduling.Commands.{CreateMatch,UpdateMatch}
-  alias Inskedular.Scheduling.Events.{MatchCreated,MatchUpdated}
+  alias Inskedular.Scheduling.Commands.{CreateMatch,UpdateMatch,DestroyMatch}
+  alias Inskedular.Scheduling.Events.{MatchCreated,MatchUpdated,MatchDestroyed}
 
   @doc """
   Create a new match
@@ -45,6 +45,17 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
     }
   end
 
+  def execute(%Match{status: :deleted}, %DestroyMatch{}) do
+    {:error, :already_deleted}
+  end
+
+  def execute(%Match{}, %DestroyMatch{} = match) do
+    %MatchDestroyed{
+      match_uuid: match.match_uuid,
+      status: "deleted",
+    }
+  end
+
   # state mutators
 
   def apply(%Match{} = match, %MatchCreated{} = created) do
@@ -66,6 +77,13 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
       score_local_team: updated.score_local_team,
       score_away_team: updated.score_away_team,
       result: updated.result,
+    }
+  end
+
+  def apply(%Match{} = match, %MatchDestroyed{} = destroyed) do
+    %Match{match |
+      uuid: destroyed.match_uuid,
+      status: :deleted
     }
   end
 end

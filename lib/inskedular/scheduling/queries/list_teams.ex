@@ -21,7 +21,7 @@ defmodule Inskedular.Scheduling.Queries.ListTeams do
   end
 
   defp query(options) do
-    from(s in Team)
+    from(t in Team, where: fragment("status != 'deleted'"))
     |> filter_by_schedule(options)
     |> order_by([a], asc: a.inserted_at)
   end

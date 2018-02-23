@@ -3,7 +3,7 @@ defmodule Inskedular.Scheduling.Projectors.Match do
                                   consistency: :strong
   use Inskedular.Support.Casting
 
-  alias Inskedular.Scheduling.Events.{MatchCreated,MatchUpdated}
+  alias Inskedular.Scheduling.Events.{MatchCreated,MatchUpdated,MatchDestroyed}
   alias Inskedular.Scheduling.Projections.Match
 
   project %MatchCreated{} = created do
@@ -29,6 +29,13 @@ defmodule Inskedular.Scheduling.Projectors.Match do
       score_local_team: updated.score_local_team,
       score_away_team: updated.score_away_team,
       result: updated.result,
+    ])
+  end
+
+  project %MatchDestroyed{} = destroyed do
+    IO.puts "[Projector.Match#project destroyed] =======> destroyed: #{inspect(destroyed)} "
+    Ecto.Multi.update_all(multi, :match, match_query(destroyed.match_uuid), set: [
+      status: destroyed.status,
     ])
   end
 

@@ -35,6 +35,7 @@ defmodule Inskedular.Scheduling.Aggregates.Team do
   def execute(%Team{}, %DestroyTeam{} = destroy) do
     %TeamDestroyed{
       team_uuid: destroy.team_uuid,
+      status: "deleted",
     }
   end
 
@@ -54,7 +55,10 @@ defmodule Inskedular.Scheduling.Aggregates.Team do
     }
   end
 
-  def apply(%Team{} = team, %TeamDestroyed{}) do
-    %Team{team | status: :deleted }
+  def apply(%Team{} = team, %TeamDestroyed{} = destroyed) do
+    %Team{team |
+      uuid: destroyed.team_uuid,
+      status: :deleted
+    }
   end
 end

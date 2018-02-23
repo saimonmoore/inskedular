@@ -21,7 +21,9 @@ defmodule Inskedular.Scheduling.Projectors.Team do
 
   project %TeamDestroyed{} = destroyed do
     IO.puts "[Projector.Team#project destroyed] =======> destroyed: #{inspect(destroyed)} "
-    Ecto.Multi.delete_all(multi, :team, team_query(destroyed.team_uuid))
+    Ecto.Multi.update_all(multi, :team, team_query(destroyed.team_uuid), set: [
+      status: destroyed.status,
+    ])
   end
 
   defp team_query(team_uuid) do

@@ -7,9 +7,9 @@ defmodule Inskedular.Scheduling do
 
   import Comb
 
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,CreateTeam,CreateMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,CreateTeam,CreateMatch,DestroyMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam}
   alias Inskedular.Scheduling.Projections.{Schedule,Team,Match}
-  alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches}
+  alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches,MatchesByScheduleUuid,TeamsByScheduleUuid}
   alias Inskedular.{Repo,Router}
 
   #######
@@ -38,6 +38,7 @@ defmodule Inskedular.Scheduling do
   def update_schedule_status(%{schedule_uuid: schedule_uuid, status: status}) do
     case status do
       "start" -> start_schedule(schedule_uuid)
+      "restart" -> restart_schedule(schedule_uuid)
       "stop"  -> stop_schedule(schedule_uuid)
       _       -> nil
     end
@@ -81,6 +82,19 @@ defmodule Inskedular.Scheduling do
   end
 
   @doc """
+  Destroy a Schedule
+  """
+  def destroy_schedule(uuid) do
+    destroy_schedule = DestroySchedule.new(%{schedule_uuid: uuid})
+
+    with :ok <- Router.dispatch(destroy_schedule, consistency: :strong) do
+      {:ok}
+    else
+      reply -> IO.puts "=====> reply: #{inspect(reply)}"
+    end
+  end
+
+  @doc """
   Get an existing schedule by the name, or return `nil` if not present
   """
   def schedule_by_name(name) when is_binary(name) do
@@ -113,7 +127,16 @@ defmodule Inskedular.Scheduling do
     String.to_integer(attr)
   end
 
-  defp stop_schedule(_schedule_uuid) do
+  defp stop_schedule(schedule_uuid) do
+    stop_schedule = %{}
+      |> assign(:schedule_uuid, schedule_uuid)
+      |> StopSchedule.new()
+
+    with :ok <- Router.dispatch(stop_schedule) do
+      get(Schedule, schedule_uuid)
+    else
+      reply -> reply
+    end
   end
 
   defp start_schedule(schedule_uuid) do
@@ -126,6 +149,32 @@ defmodule Inskedular.Scheduling do
     else
       reply -> reply
     end
+  end
+
+  defp restart_schedule(schedule_uuid) do
+    restart_schedule = %{}
+      |> assign(:schedule_uuid, schedule_uuid)
+      |> RestartSchedule.new()
+
+    with :ok <- Router.dispatch(restart_schedule) do
+      get(Schedule, schedule_uuid)
+    else
+      reply -> reply
+    end
+  end
+
+  def destroy_matches(%{schedule_uuid: schedule_uuid}) do
+    IO.puts "[Scheduling#destroy_matches] =======> schedule_uuid: #{schedule_uuid}"
+    MatchesByScheduleUuid.new(schedule_uuid)
+    |> Repo.all
+    |> Enum.each(fn(match) -> destroy_match(match) end)
+  end
+
+  def destroy_teams(%{schedule_uuid: schedule_uuid}) do
+    IO.puts "[Scheduling#destroy_teams] =======> schedule_uuid: #{schedule_uuid}"
+    TeamsByScheduleUuid.new(schedule_uuid)
+    |> Repo.all
+    |> Enum.each(fn(team) -> destroy_team(team) end)
   end
 
   def create_matches(%{schedule_uuid: schedule_uuid, round_number: round_number}) do
@@ -211,13 +260,16 @@ defmodule Inskedular.Scheduling do
   end
 
   @doc """
-  Destroy a Schedule
+  Destroy a Match
   """
-  def destroy_schedule(uuid) do
-    destroy_schedule = DestroySchedule.new(%{schedule_uuid: uuid})
+  def destroy_match(%{uuid: uuid}) do
+    IO.puts "[Scheduling#destroy_match] =======> uuid: #{uuid}"
+    match = DestroyMatch.new(%{match_uuid: uuid})
 
-    with :ok <- Router.dispatch(destroy_schedule, consistency: :strong) do
+    with :ok <- Router.dispatch(match, consistency: :strong) do
       {:ok}
+    else
+      reply -> IO.puts "[destroy_match] =====> reply: #{inspect(reply)}"
     end
   end
 
@@ -278,11 +330,14 @@ defmodule Inskedular.Scheduling do
   @doc """
   Destroy a Team
   """
-  def destroy_team(uuid) do
-    destroy_team = DestroyTeam.new(%{team_uuid: uuid})
+  def destroy_team(%{uuid: uuid}) do
+    IO.puts "[Scheduling#destroy_team] =======> uuid: #{uuid}"
+    team = DestroyTeam.new(%{team_uuid: uuid})
 
-    with :ok <- Router.dispatch(destroy_team, consistency: :strong) do
+    with :ok <- Router.dispatch(team, consistency: :strong) do
       :ok
+    else
+      reply -> IO.puts "[destroy_team] =====> reply: #{inspect(reply)}"
     end
   end
 

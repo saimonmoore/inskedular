@@ -5,6 +5,6 @@ defmodule Inskedular.Scheduling.Queries.ScheduleByName do
 
   def new(name) do
     from s in Schedule,
-    where: s.name == ^name
+      where: s.name == ^name and fragment("status != 'deleted'")
   end
 end

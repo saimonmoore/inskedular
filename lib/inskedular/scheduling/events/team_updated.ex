@@ -3,5 +3,6 @@ defmodule Inskedular.Scheduling.Events.TeamUpdated do
   defstruct [
     :team_uuid,
     :name,
+    :status,
   ]
 end

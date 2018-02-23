@@ -5,6 +5,7 @@ defmodule Inskedular.Scheduling.Projections.Team do
 
   schema "scheduling_teams" do
     field :name, :string
+    field :status, :string
     field :schedule_uuid, :binary_id
 
     timestamps(type: :utc_datetime)
