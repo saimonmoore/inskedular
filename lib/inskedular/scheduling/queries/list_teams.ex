@@ -21,7 +21,7 @@ defmodule Inskedular.Scheduling.Queries.ListTeams do
   end
 
   defp query(options) do
-    from(t in Team, where: fragment("status != 'deleted'"))
+    from(t in Team, where: fragment("? is distinct from 'deleted'", field(t, :status)))
     |> filter_by_schedule(options)
     |> order_by([a], asc: a.inserted_at)
   end

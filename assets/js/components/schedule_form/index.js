@@ -129,7 +129,7 @@ class ScheduleForm extends Component {
     promise.then(json => {
       this.setState({ ...moreState, uuid: json.uuid })
 
-      if (!uuid) this.resetForm()
+      // if (!uuid) this.resetForm()
     }).catch(error => {
       console.error(`There has been a problem with your fetch operation: ${error.message}`)
     })

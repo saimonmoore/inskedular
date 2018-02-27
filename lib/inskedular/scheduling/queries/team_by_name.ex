@@ -4,7 +4,7 @@ defmodule Inskedular.Scheduling.Queries.TeamByName do
   alias Inskedular.Scheduling.Projections.Team
 
   def new(name) do
-    from s in Team,
-    where: s.name == ^name
+    from t in Team,
+    where: t.name == ^name and fragment("? is distinct from 'deleted'", field(t, :status))
   end
 end

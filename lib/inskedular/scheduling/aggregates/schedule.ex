@@ -61,6 +61,10 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     {:error, :already_started}
   end
 
+  def execute(%Schedule{status: "started"}, %StartSchedule{}) do
+    {:error, :already_started}
+  end
+
   @doc """
   Trigger stop of schedule (Willjust change status of Schedule)
   """
@@ -79,6 +83,16 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   Trigger restart of schedule (Will delete all matches and create all the first round matches)
   """
   def execute(%Schedule{status: "stopped"}, %RestartSchedule{} = restart) do
+    %ScheduleRestarted{
+      schedule_uuid: restart.schedule_uuid,
+      status: "running",
+    }
+  end
+
+  @doc """
+  Trigger restart of schedule (Will delete all matches and create all the first round matches)
+  """
+  def execute(%Schedule{status: "started"}, %RestartSchedule{} = restart) do
     %ScheduleRestarted{
       schedule_uuid: restart.schedule_uuid,
       status: "running",

@@ -21,7 +21,7 @@ defmodule Inskedular.Scheduling.Queries.ListMatches do
   end
 
   defp query(options) do
-    from(m in Match, where: fragment("status != 'deleted'"))
+    from(m in Match, where: fragment("? is distinct from 'deleted'", field(m, :status)))
     |> filter_by_schedule(options)
     |> order_by([a], asc: a.match_number)
   end

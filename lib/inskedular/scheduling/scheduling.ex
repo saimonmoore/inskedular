@@ -54,6 +54,7 @@ defmodule Inskedular.Scheduling do
       attrs
       |> cast_schedule_attributes
       |> assign(:schedule_uuid, uuid)
+      |> assign(:competition_type, :league) # Hard code competition_type
       |> CreateSchedule.new()
 
     with :ok <- Router.dispatch(create_schedule, consistency: :strong) do
@@ -179,6 +180,7 @@ defmodule Inskedular.Scheduling do
 
   def create_matches(%{schedule_uuid: schedule_uuid, round_number: round_number}) do
     {:ok, %Schedule{competition_type: competition_type} = schedule} = get(Schedule, schedule_uuid)
+    IO.puts "[Scheduling#create_matches] =======> schedule_uuid: #{schedule_uuid} competition_type: #{inspect(competition_type)}"
     commands = case String.to_atom(competition_type) do
       :league -> create_league_matches(%{schedule: schedule, round_number: round_number})
       :knockout -> create_knockout_matches(%{schedule: schedule, round_number: round_number})
@@ -193,8 +195,10 @@ defmodule Inskedular.Scheduling do
 
   # TODO: Calculate proper league combinations
   defp create_league_matches(%{schedule: schedule, round_number: round_number}) do
+    IO.puts "[Scheduling#create_league_matches] =======> schedule: #{inspect(schedule)}"
     teams = list_teams(%{"schedule_uuid" => schedule.uuid})
 
+    IO.puts "[Scheduling#create_league_matches] =======> teams: #{inspect(teams)}"
     calculate_league_matches(schedule, teams, round_number)
     |> Enum.map(
       fn(match) ->

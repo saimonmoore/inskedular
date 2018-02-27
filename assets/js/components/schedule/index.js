@@ -23,6 +23,7 @@ export default withRouter(observer(class Schedule extends Component {
     const { schedule } = this.props
     switch (schedule.get('status')) {
       case 'inactive': this.startSchedule(); break
+      case 'started': this.restartSchedule(); break
       case 'stopped': this.restartSchedule(); break
       case 'running': this.cancelSchedule(); break
       default: this.doNothing(event)
@@ -118,7 +119,7 @@ export default withRouter(observer(class Schedule extends Component {
     const { schedule } = this.props
     const scheduleStatus = schedule.get('status')
     switch (scheduleStatus) {
-      case 'started': return 'Setting up matches...'
+      case 'started': return 'Restart'
       case 'terminated': return 'Delete'
       case 'running': return 'Cancel'
       case 'inactive': return 'Start'
@@ -137,6 +138,10 @@ export default withRouter(observer(class Schedule extends Component {
     const isRunning = schedule.get('status') === 'running'
     const isStopped = schedule.get('status') === 'stopped'
     const pollingAction = isRunning ? 'Stopping' : 'Starting'
+
+    if (schedule.isRequest('fetching')) {
+      return <Loading label='schedule' />
+    }
 
     if (redirectedToShow) {
       return <Redirect to={{

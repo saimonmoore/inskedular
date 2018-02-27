@@ -5,6 +5,6 @@ defmodule Inskedular.Scheduling.Queries.MatchesByScheduleUuid do
 
   def new(schedule_uuid) do
     from m in Match,
-      where: m.schedule_uuid == ^schedule_uuid and fragment("status != 'deleted'")
+      where: m.schedule_uuid == ^schedule_uuid and fragment("? is distinct from 'deleted'", field(m, :status))
   end
 end

@@ -9,7 +9,5 @@ defmodule Inskedular.Repo.Migrations.CreateSchedulingTeams do
 
       timestamps(type: :timestamptz)
     end
-
-    create unique_index(:scheduling_teams, [:name, :schedule_uuid])
   end
 end

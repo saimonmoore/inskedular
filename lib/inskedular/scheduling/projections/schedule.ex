@@ -1,5 +1,6 @@
 defmodule Inskedular.Scheduling.Projections.Schedule do
   use Ecto.Schema
+  import Ecto.Changeset
 
   @primary_key {:uuid, :binary_id, autogenerate: false}
 
@@ -14,5 +15,10 @@ defmodule Inskedular.Scheduling.Projections.Schedule do
     field :end_date, :utc_datetime
 
     timestamps(type: :utc_datetime)
+  end
+
+  def changeset(schedule, _params \\ %{}) do
+    schedule
+    |> unique_constraint(:name)
   end
 end
