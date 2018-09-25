@@ -19,6 +19,14 @@ const styles = {
   }
 }
 
+const NoMatches = () => {
+  return (
+    <tr>
+      <td colSpan="6">No Matches!</td>
+    </tr>
+  )
+}
+
 class Matches extends Component {
   constructor(props) {
     super(props)
@@ -27,11 +35,14 @@ class Matches extends Component {
       filters: {
         player: 'all',
         opponent: 'all',
+        result: 'all',
+        status: 'all',
       }
     }
 
     this.filterPlayer = this.filterPlayer.bind(this)
     this.filterOpponent = this.filterOpponent.bind(this)
+    this.filterStatus = this.filterStatus.bind(this)
     this.players = this.players.bind(this)
     this.opponents = this.opponents.bind(this)
   }
@@ -76,22 +87,44 @@ class Matches extends Component {
     this.setState({ filters })
   }
 
+  filterStatus(event) {
+    const statusFilter = event.target.value
+    const { filters } = this.state || {}
+    filters.status = statusFilter
+
+    this.setState({ filters })
+  }
+
   filterMatch(match) {
     const { filters } = this.state || {}
-    const { player: playerFilter, opponent: opponentFilter } = filters
+    const { player: playerFilter, opponent: opponentFilter, status: statusFilter } = filters
+    const matchAllPlayers = () => (true)
+    const matchAnyStatus = () => (true)
+    const matchPlayerLocalOrAway = (match) => (match.get('local_team_uuid') == playerFilter || match.get('away_team_uuid') === playerFilter)
+    const matchPlayerLocalAndOpponentAway = (match) => (match.get('local_team_uuid') == playerFilter && match.get('away_team_uuid') === opponentFilter)
+    const matchOpponentLocalAndPlayerAway = (match) => (match.get('local_team_uuid') == opponentFilter && match.get('away_team_uuid') === playerFilter)
+    const matchPlayerAndOpponent = (match) => (matchOpponentLocalAndPlayerAway(match) || matchPlayerLocalAndOpponentAway(match))
+    const matchStatus = (match) => (match.get('status') == statusFilter)
 
-    if (playerFilter === 'all') return true
+    const filtersToApply = []
 
-    if (playerFilter && !opponentFilter) {
-      return match.get('local_team_uuid') == playerFilter || match.get('away_team_uuid') === playerFilter
+    if (playerFilter === 'all') filtersToApply.push(matchAllPlayers)
+    if (statusFilter === 'all') filtersToApply.push(matchAnyStatus)
+    if (statusFilter !== 'all') filtersToApply.push(matchStatus)
+
+    if (playerFilter !== 'all' && opponentFilter === 'all') {
+      filtersToApply.push(matchPlayerLocalOrAway)
     }
 
-    if (playerFilter && opponentFilter) {
-      if (opponentFilter === 'all') return match.get('local_team_uuid') == playerFilter || match.get('away_team_uuid') === playerFilter
-
-      return (match.get('local_team_uuid') == playerFilter && match.get('away_team_uuid') === opponentFilter)
-      || (match.get('local_team_uuid') == opponentFilter && match.get('away_team_uuid') === playerFilter)
+    if (playerFilter !== 'all' && opponentFilter !== 'all') {
+      filtersToApply.push(matchPlayerAndOpponent)
     }
+
+    return filtersToApply.every((filter) => filter(match))
+  }
+
+  filteredMatches() {
+    return matches.models.filter(match => (this.filterMatch(match)))
   }
 
   players() {
@@ -131,6 +164,10 @@ class Matches extends Component {
     const schedule = this.schedule()
     const players = this.players()
     const opponents = this.opponents()
+    const filteredMatches = this.filteredMatches()
+    const { filters } = this.state
+    const { player: playerFilter } = filters
+    const hasPlayerFilter = playerFilter !== 'all'
 
     return (
       <div className='Matches'>
@@ -148,13 +185,20 @@ class Matches extends Component {
             </select>
           </div>
           <div style={styles.filter}>
-            <select id='filterOpponent' onChange={this.filterOpponent}>
+            <select id='filterOpponent' onChange={this.filterOpponent} disabled={!hasPlayerFilter}>
               <option value="all">All opponents</option>
               {
                 opponents.map(team => (
                   <option value={team.id} key={team.get('name')}>{team.get('name')}</option>
                 ))
               }
+            </select>
+          </div>
+          <div style={styles.filter}>
+            <select id='filterStatus' onChange={this.filterStatus}>
+              <option value="all">Any Status</option>
+              <option value="played">Played</option>
+              <option value="unplayed">Unplayed</option>
             </select>
           </div>
         </div>
@@ -171,9 +215,9 @@ class Matches extends Component {
           </thead>
           <tbody>
             {
-              matches.models.map(match => (
-                this.filterMatch(match) && <Match key={ match.id } match={ match } schedule={ schedule } teams={ teams } />
-              ))
+              filteredMatches.length ? 
+                filteredMatches.map(match => (<Match key={ match.id } match={ match } schedule={ schedule } teams={ teams } />))
+                : <NoMatches/>
             }
           </tbody>
         </table>
