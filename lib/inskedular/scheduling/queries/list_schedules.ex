@@ -23,6 +23,6 @@ defmodule Inskedular.Scheduling.Queries.ListSchedules do
 
   defp query(_options) do
     from s in Schedule,
-    where: fragment("? is distinct from 'deleted'", field(s, :status))
+    where: fragment("? is distinct from 'terminated'", field(s, :status))
   end
 end

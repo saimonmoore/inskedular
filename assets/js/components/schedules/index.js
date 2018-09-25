@@ -11,7 +11,15 @@ class Schedules extends Component {
     schedules.fetch()
   }
 
+  nonTerminatedSchedules() {
+    return schedules.models.filter(schedule => (
+      schedule.get('status') !== 'terminated'
+    ))
+  }
+
   render() {
+    const nonTerminatedSchedules = this.nonTerminatedSchedules()
+
     if (schedules.isRequest('fetching')) {
       return <Loading label='schedules' />
     }
@@ -19,7 +27,7 @@ class Schedules extends Component {
     return (
       <div className='Schedules'>
         {
-          schedules.models.map(schedule => (
+          nonTerminatedSchedules.map(schedule => (
             <Schedule key={ schedule.id } schedule={ schedule } />
           ))
         }

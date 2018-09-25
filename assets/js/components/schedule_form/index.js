@@ -12,6 +12,12 @@ const WrappedLink = props => (
   </button>
 )
 
+const styles = {
+  validation: {
+    color: "red",
+  }
+}
+
 class ScheduleForm extends Component {
   constructor(props) {
     super(props)
@@ -19,6 +25,7 @@ class ScheduleForm extends Component {
     this.state = {
       form: {},
       submitted: false,
+      valid: true,
       name: '',
       competition_type: 'league',
       number_of_games: 1,
@@ -142,14 +149,30 @@ class ScheduleForm extends Component {
     })
   }
 
+  validate() {
+    const { name } = this.state
+
+    const valid = name.length >= 2
+
+    if (!valid) {
+      this.setState({ valid })
+    }
+
+    return valid
+  }
+
   handleSubmit(event) {
+    event && event.preventDefault()
+
+    if (!this.validate()) {
+      return
+    }
     this.createOrUpdateSchedule()
-    event.preventDefault()
   }
 
   render() {
     let schedule
-    const { submitted, uuid } = this.state
+    const { submitted, uuid, valid } = this.state
     if (submitted) {
       return <Redirect to={{ pathname: `/add_teams/${uuid}` }}/>
     }
@@ -169,6 +192,7 @@ class ScheduleForm extends Component {
             type="text"
             value={ this.state.name }
             onChange={ this.handleInputChange } />
+          { !valid && ( <span style={styles.validation}>'name' is required!</span>)}
         </label>
         <label>
           Competition Type:
@@ -177,6 +201,7 @@ class ScheduleForm extends Component {
             id='schedule_competition_type'
             name='competitionType'
             value={ this.state.competition_type }
+            title="Only league is supported for now..."
             onChange={ this.handleInputChange } >
             <option value="league">League</option>
             <option value="knockout">Knockout</option>
@@ -202,12 +227,17 @@ class ScheduleForm extends Component {
         </label>
         <label>
           Number of games:
-          <input
+          <select
             id='schedule_number_of_games'
             name='number_of_games'
-            type="text"
             value={ this.state.number_of_games }
-            onChange={ this.handleInputChange } />
+            onChange={ this.handleInputChange } >
+            {
+              Array.from(Array(10).keys()).map((gameNumber) => (
+                <option key={gameNumber + 1} value={gameNumber + 1}>{gameNumber + 1}</option>
+              ))
+            }
+          </select>
         </label>
         <label>
           {/* Number of weeks: */}

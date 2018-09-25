@@ -18,6 +18,9 @@ defmodule Inskedular.Application do
       # Scheduling supervisor
       supervisor(Inskedular.Scheduling.Supervisor, []),
 
+      # Async task supervisor
+      supervisor(Task.Supervisor, [[name: Inskedular.TaskSupervisor]]),
+
       # process managers
       worker(Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager, []),
 

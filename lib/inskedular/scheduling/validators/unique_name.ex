@@ -6,8 +6,9 @@ defmodule Inskedular.Scheduling.Validators.UniqueName do
 
   def validate(name, context) do
     schedule_uuid = Map.get(context, :schedule_uuid)
+    name_taken = name_taken?(name, schedule_uuid)
 
-    case name_taken?(name, schedule_uuid) do
+    case name_taken do
       true -> {:error, "has already been taken"}
       false -> :ok
     end
@@ -15,9 +16,9 @@ defmodule Inskedular.Scheduling.Validators.UniqueName do
 
   defp name_taken?(name, schedule_uuid) do
     case Scheduling.schedule_by_name(name) do
-      %Schedule{uuid: ^schedule_uuid} -> false
+      %Schedule{uuid: ^schedule_uuid} -> true
       nil -> false
-      _ -> true
+      _ -> false
     end
   end
 end

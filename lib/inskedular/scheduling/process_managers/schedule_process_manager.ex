@@ -43,12 +43,12 @@ defmodule Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager do
 
   def handle(%ScheduleProcessManager{}, %ScheduleDestroyed{schedule_uuid: schedule_uuid}) do
     IO.puts "[ScheduleProcessManager#handle ScheduleDestroyed] =======> schedule_uuid: #{schedule_uuid}"
+    Scheduling.terminate_schedule(%{schedule_uuid: schedule_uuid})
+    IO.puts "[ScheduleProcessManager#handle ScheduleDestroyed] =======> updated schedule's status to terminated!"
     Scheduling.destroy_matches(%{schedule_uuid: schedule_uuid})
     IO.puts "[ScheduleProcessManager#handle ScheduleDestroyed] =======> destroyed matches"
     Scheduling.destroy_teams(%{schedule_uuid: schedule_uuid})
     IO.puts "[ScheduleProcessManager#handle ScheduleDestroyed] =======> destroyed teams"
-    Scheduling.destroy_schedule(%{schedule_uuid: schedule_uuid})
-    IO.puts "[ScheduleProcessManager#handle ScheduleDestroyed] =======> destroyed schedule"
     nil
   end
 

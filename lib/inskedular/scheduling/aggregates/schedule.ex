@@ -12,8 +12,8 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   ]
 
   alias Inskedular.Scheduling.Aggregates.Schedule
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,IncludeMatchesInSchedule}
-  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,ScheduleRestarted,ScheduleStopped,MatchesCreated}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,IncludeMatchesInSchedule,TerminateSchedule}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,ScheduleRestarted,ScheduleStopped,MatchesCreated,ScheduleTerminated}
 
   @doc """
   Create a new schedule
@@ -99,17 +99,16 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     }
   end
 
-  def execute(%Schedule{status: "deleted"}, %DestroySchedule{}) do
+  def execute(%Schedule{status: "terminated"}, %DestroySchedule{}) do
     {:error, :already_deleted}
   end
 
   @doc """
-  Trigger start of schedule (Will create all the first round matches)
+  Trigger destruction of schedule (Will delete all matches & teams & schedule itself)
   """
   def execute(%Schedule{}, %DestroySchedule{} = destroy) do
     %ScheduleDestroyed{
       schedule_uuid: destroy.schedule_uuid,
-      status: "deleted",
     }
   end
 
@@ -121,6 +120,20 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
       schedule_uuid: included_matches.schedule_uuid,
       status: "running",
     }
+  end
+
+  @doc """
+  Trigger termination of schedule (Marked as terminated)
+  """
+  def execute(%Schedule{status: "stopped"}, %TerminateSchedule{} = terminate) do
+    %ScheduleTerminated{
+      schedule_uuid: terminate.schedule_uuid,
+      status: "terminated",
+    }
+  end
+
+  def execute(%Schedule{status: "terminated"}, %TerminateSchedule{}) do
+    {:error, :already_terminated}
   end
 
   # state mutators
@@ -181,7 +194,13 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   def apply(%Schedule{} = schedule, %ScheduleDestroyed{} = destroyed) do
     %Schedule{schedule |
       uuid: destroyed.schedule_uuid,
-      status: :deleted
+    }
+  end
+
+  def apply(%Schedule{} = schedule, %ScheduleTerminated{} = terminated) do
+    %Schedule{schedule |
+      uuid: terminated.schedule_uuid,
+      status: :terminated
     }
   end
 end

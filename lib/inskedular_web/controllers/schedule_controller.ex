@@ -41,9 +41,15 @@ defmodule InskedularWeb.ScheduleController do
   end
 
   def delete(conn, %{"id" => team_uuid}) do
-    with {:ok } <- Scheduling.destroy_schedule(team_uuid) do
-      conn
-      |> put_status(:ok)
-    end
+    # with {:ok } <- Scheduling.destroy_schedule(team_uuid) do
+    #   conn
+    #   |> put_status(:ok)
+    # end
+    Task.Supervisor.async_nolink(
+      Inskedular.TaskSupervisor,
+      fn -> Scheduling.destroy_schedule(team_uuid) end
+    )
+
+    send_resp(conn, :ok, "{}")
   end
 end

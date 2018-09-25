@@ -12,6 +12,8 @@ export default withRouter(observer(class Schedule extends Component {
       polling: false,
       poller: false,
     }
+
+    this.redirectToScheduleShow = this.redirectToScheduleShow.bind(this)
   }
 
   componentWillMount() {
@@ -37,6 +39,11 @@ export default withRouter(observer(class Schedule extends Component {
 
   pollForStopped() {
     const poller = setInterval(() => { this.pollStatus.bind(this)('stopped') }, 2000)
+    this.setState({ poller, polling: true })
+  }
+
+  pollForDestroyed() {
+    const poller = setInterval(() => { this.pollStatus.bind(this)('terminated') }, 2000)
     this.setState({ poller, polling: true })
   }
 
@@ -111,7 +118,16 @@ export default withRouter(observer(class Schedule extends Component {
     event && event.preventDefault();
   }
 
+  isEditingDisabled() {
+    const { schedule } = this.props
+    const scheduleStatus = schedule.get('status')
+
+    return (scheduleStatus !== 'inactive')
+  }
+
   redirectToScheduleShow() {
+    if (this.isEditingDisabled()) return
+
     this.setState({ redirectedToShow: true })
   }
 
@@ -120,11 +136,13 @@ export default withRouter(observer(class Schedule extends Component {
     const scheduleStatus = schedule.get('status')
     switch (scheduleStatus) {
       case 'started': return 'Restart'
-      case 'terminated': return 'Delete'
-      case 'running': return 'Cancel'
+      case 'terminated': return
+      case 'running': return 'Stop'
+      case 'starting': return
+      case 'stopping': return
       case 'inactive': return 'Start'
       case 'stopped': return 'Restart'
-      default: return 'Delete'
+      default: return
     }
   }
 
@@ -138,6 +156,7 @@ export default withRouter(observer(class Schedule extends Component {
     const isRunning = schedule.get('status') === 'running'
     const isStopped = schedule.get('status') === 'stopped'
     const pollingAction = isRunning ? 'Stopping' : 'Starting'
+    const isEditingDisabled = this.isEditingDisabled()
 
     if (schedule.isRequest('fetching')) {
       return <Loading label='schedule' />
@@ -155,9 +174,11 @@ export default withRouter(observer(class Schedule extends Component {
       ? 'Schedule Schedule--New'
       : 'Schedule'
 
+    const scheduleTitle = isEditingDisabled ? "Editing is no longer possible!" : "Click to edit!"
+
     return (
       <div className={ className } >
-        <span className="name" onClick={ this.redirectToScheduleShow.bind(this) } style={{ cursor: 'pointer' }}>
+        <span className="name" onClick={ this.redirectToScheduleShow } style={{ cursor: 'pointer' }} title={scheduleTitle}>
           <strong>{schedule.get('name')}</strong>
         </span>
         &nbsp;
@@ -177,12 +198,15 @@ export default withRouter(observer(class Schedule extends Component {
         </span>
         &nbsp;
         <span className="actions">
-          <button onClick={ this.handleUpdateStatus.bind(this) }>
-            { scheduleStatus }
-          </button>
-
           {
-            isStopped &&
+            !polling && (
+              <button onClick={ this.handleUpdateStatus.bind(this) }>
+                { scheduleStatus }
+              </button>
+            )
+          }
+          {
+            !polling && isStopped &&
             <button onClick={ this.destroySchedule.bind(this) }>
               Delete
             </button>
@@ -190,7 +214,7 @@ export default withRouter(observer(class Schedule extends Component {
         </span>
         &nbsp;
         {
-          isRunning &&
+          !polling && isRunning &&
             <span>
               <Link to={{ pathname: `/matches/${schedule.id}`, state: { schedule_uuid: schedule.id } }} style={{ marginRight: '5px' }}>Matches</Link>
               <Link to={{ pathname: `/stats/${schedule.id}`, state: { schedule_uuid: schedule.id } }}>Stats</Link>

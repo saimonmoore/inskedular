@@ -29,7 +29,7 @@ defmodule InskedularWeb.TeamController do
   end
 
   def delete(conn, %{ "id" => team_uuid }) do
-    with :ok <- Scheduling.destroy_team(team_uuid) do
+    with :ok <- Scheduling.destroy_team(%{uuid: team_uuid}) do
       send_resp(conn, :ok, "{}")
     end
   end

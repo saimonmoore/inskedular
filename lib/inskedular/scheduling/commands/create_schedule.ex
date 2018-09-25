@@ -18,15 +18,15 @@ defmodule Inskedular.Scheduling.Commands.CreateSchedule do
   alias Inskedular.Scheduling.Commands.CreateSchedule
 
   validates :schedule_uuid, uuid: true
-  validates :name, presence: [message: "can't be empty"], string: true, by: &UniqueName.validate/2
+  validates :name, presence: [message: "can't be empty"], string: true #, by: &UniqueName.validate/2
   validates :number_of_games, presence: true, number: true
   validates :number_of_weeks, presence: true, number: true
   validates :game_duration, number: true
   validates :competition_type, presence: true #, in: ~w(knockout league)
 
-  defimpl UniqueFields, for: CreateSchedule do
-    def unique(%Inskedular.Scheduling.Commands.CreateSchedule{schedule_uuid: schedule_uuid}), do: [
-      {:name, "has already been taken", schedule_uuid},
-    ]
-  end  
+  # defimpl UniqueFields, for: CreateSchedule do
+  #   def unique(%Inskedular.Scheduling.Commands.CreateSchedule{schedule_uuid: schedule_uuid}), do: [
+  #     {:name, "has already been taken", schedule_uuid},
+  #   ]
+  # end  
 end

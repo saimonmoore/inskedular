@@ -7,7 +7,7 @@ defmodule Inskedular.Scheduling do
 
   import Comb
 
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,CreateTeam,CreateMatch,DestroyMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,CreateTeam,CreateMatch,DestroyMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam,TerminateSchedule}
   alias Inskedular.Scheduling.Projections.{Schedule,Team,Match}
   alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches,MatchesByScheduleUuid,TeamsByScheduleUuid}
   alias Inskedular.{Repo,Router}
@@ -41,6 +41,21 @@ defmodule Inskedular.Scheduling do
       "restart" -> restart_schedule(schedule_uuid)
       "stop"  -> stop_schedule(schedule_uuid)
       _       -> nil
+    end
+  end
+
+  @doc """
+  Update a Schedule's status as terminated
+  """
+  def terminate_schedule(%{schedule_uuid: schedule_uuid}) do
+    terminate_schedule = %{}
+      |> assign(:schedule_uuid, schedule_uuid)
+      |> TerminateSchedule.new()
+
+    with :ok <- Router.dispatch(terminate_schedule) do
+      get(Schedule, schedule_uuid)
+    else
+      reply -> reply
     end
   end
 
@@ -165,7 +180,7 @@ defmodule Inskedular.Scheduling do
   end
 
   def destroy_matches(%{schedule_uuid: schedule_uuid}) do
-    IO.puts "[Scheduling#destroy_matches] =======> schedule_uuid: #{schedule_uuid}"
+      IO.puts "[Scheduling#destroy_matches] =======> schedule_uuid: #{schedule_uuid}"
     MatchesByScheduleUuid.new(schedule_uuid)
     |> Repo.all
     |> Enum.each(fn(match) -> destroy_match(match) end)

@@ -15,7 +15,5 @@ defmodule Inskedular.Repo.Migrations.CreateSchedulingSchedules do
 
       timestamps(type: :timestamptz)
     end
-
-    create unique_index(:scheduling_schedules, [:name])
   end
 end

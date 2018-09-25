@@ -38,7 +38,6 @@ class Stats extends Component {
       const statsForTeam = { played: 0, wins: 0, draws: 0, losses: 0, points: 0 }
       const stats = {}
 
-      console.log('====> length: ', matches.models.length)
       matches.models.reduce((teamStats, match) => {
         const isPlayed = this.isPlayed(match, team)
         const isWin = this.isWin(match, team)
