@@ -9,15 +9,31 @@ import teams from '../../stores/teams'
 import Loading from '../loading'
 import Match from '../match'
 
+const styles = {
+  filters: {
+    display: 'flex',
+  },
+  filter: {
+    marginLeft: '5px',
+    marginRight: '10px',
+  }
+}
+
 class Matches extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      filter: 'all',
+      filters: {
+        player: 'all',
+        opponent: 'all',
+      }
     }
 
     this.filterPlayer = this.filterPlayer.bind(this)
+    this.filterOpponent = this.filterOpponent.bind(this)
+    this.players = this.players.bind(this)
+    this.opponents = this.opponents.bind(this)
   }
 
   componentWillMount() {
@@ -45,13 +61,50 @@ class Matches extends Component {
   }
 
   filterPlayer(event) {
-    const filter = event.target.value
-    this.setState({ filter })
+    const playerFilter = event.target.value
+    const { filters } = this.state || {}
+    filters.player = playerFilter
+
+    this.setState({ filters })
   }
 
-  filterMatch(match, filter) {
-    if (filter === 'all') return true
-    return match.get('local_team_uuid') == filter || match.get('away_team_uuid') === filter
+  filterOpponent(event) {
+    const opponentFilter = event.target.value
+    const { filters } = this.state || {}
+    filters.opponent = opponentFilter
+
+    this.setState({ filters })
+  }
+
+  filterMatch(match) {
+    const { filters } = this.state || {}
+    const { player: playerFilter, opponent: opponentFilter } = filters
+
+    if (playerFilter === 'all') return true
+
+    if (playerFilter && !opponentFilter) {
+      return match.get('local_team_uuid') == playerFilter || match.get('away_team_uuid') === playerFilter
+    }
+
+    if (playerFilter && opponentFilter) {
+      if (opponentFilter === 'all') return match.get('local_team_uuid') == playerFilter || match.get('away_team_uuid') === playerFilter
+
+      return (match.get('local_team_uuid') == playerFilter && match.get('away_team_uuid') === opponentFilter)
+      || (match.get('local_team_uuid') == opponentFilter && match.get('away_team_uuid') === playerFilter)
+    }
+  }
+
+  players() {
+    return teams.models
+  }
+
+  opponents() {
+    const { filters } = this.state
+    const { player: playerFilter } = filters
+
+    if (!playerFilter) return this.players()
+
+    return this.players().filter((player) => ( player.get('uuid') !== playerFilter))
   }
 
   render() {
@@ -76,20 +129,35 @@ class Matches extends Component {
     }
 
     const schedule = this.schedule()
-    const filter = this.state.filter
+    const players = this.players()
+    const opponents = this.opponents()
 
     return (
       <div className='Matches'>
         <h3>Matches for { schedule.get('name') }</h3>
-        <span>Filter for: </span>
-        <select id='filterPlayer' onChange={this.filterPlayer}>
-          <option value="all">All players</option>
-          {
-            teams.models.map(team => (
-              <option value="all" value={team.id} key={team.get('name')}>{team.get('name')}</option>
-            ))
-          }
-        </select>
+        <div style={styles.filters}>
+          <span>Filter by: </span>
+          <div style={styles.filter}>
+            <select id='filterPlayer' onChange={this.filterPlayer}>
+              <option value="all">All players</option>
+              {
+                players.map(team => (
+                  <option value={team.id} key={team.get('name')}>{team.get('name')}</option>
+                ))
+              }
+            </select>
+          </div>
+          <div style={styles.filter}>
+            <select id='filterOpponent' onChange={this.filterOpponent}>
+              <option value="all">All opponents</option>
+              {
+                opponents.map(team => (
+                  <option value={team.id} key={team.get('name')}>{team.get('name')}</option>
+                ))
+              }
+            </select>
+          </div>
+        </div>
         <table>
           <thead>
             <tr>
@@ -102,11 +170,11 @@ class Matches extends Component {
             </tr>
           </thead>
           <tbody>
-        {
-          matches.models.map(match => (
-            this.filterMatch(match, filter) && <Match key={ match.id } match={ match } schedule={ schedule } teams={ teams } />
-          ))
-        }
+            {
+              matches.models.map(match => (
+                this.filterMatch(match) && <Match key={ match.id } match={ match } schedule={ schedule } teams={ teams } />
+              ))
+            }
           </tbody>
         </table>
         <Link to={{ pathname: '/' }}>Back</Link>
