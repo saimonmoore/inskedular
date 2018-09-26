@@ -125,6 +125,7 @@ class Stats extends Component {
     return (
       <div className='Stats'>
         <h3>Stats for { schedule.get('name') }</h3>
+        <Link to={{ pathname: '/' }}>Back</Link>
         <table>
           <thead>
             <tr>

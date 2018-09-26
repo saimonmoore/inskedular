@@ -16,6 +16,9 @@ const styles = {
   filter: {
     marginLeft: '5px',
     marginRight: '10px',
+  },
+  back: {
+    marginLeft: '450px',
   }
 }
 
@@ -201,6 +204,7 @@ class Matches extends Component {
               <option value="unplayed">Unplayed</option>
             </select>
           </div>
+          <Link to={{ pathname: '/' }} style={styles.back}>Back</Link>
         </div>
         <table>
           <thead>
