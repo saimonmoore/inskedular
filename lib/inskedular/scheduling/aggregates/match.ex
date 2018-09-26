@@ -13,6 +13,7 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
     :end_date,
   ]
 
+  alias Commanded.Aggregate.Multi
   alias Inskedular.Scheduling.Aggregates.Match
   alias Inskedular.Scheduling.Commands.{CreateMatch,UpdateMatch,DestroyMatch}
   alias Inskedular.Scheduling.Events.{MatchCreated,MatchUpdated,MatchDestroyed}

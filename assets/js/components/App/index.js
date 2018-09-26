@@ -28,10 +28,8 @@ apiClient(adapter, {
 
 const Home = () => (
   <section className="box special">
-    <NavLink to="/schedule/new" activeClassName="button">New League</NavLink>
-    <header className="major">
-      <h3>Leagues</h3>
-    </header>
+    <NavLink to="/schedule/new" activeClassName="button">New Tournament</NavLink>
+    <header className="major"></header>
     <Schedules />
   </section>
 )
@@ -39,7 +37,7 @@ const Home = () => (
 const NewSchedule = () => (
   <section className="box special">
     <header className="major">
-      <h2>New League</h2>
+      <h2>New Tournament</h2>
       <ScheduleForm />
     </header>
     <Link to="/">Back</Link>

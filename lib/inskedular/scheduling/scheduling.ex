@@ -60,18 +60,15 @@ defmodule Inskedular.Scheduling do
   end
 
   @doc """
-  Update a Schedule's status as completed
+  Return a command to update a Schedule's status as completed
   """
   def complete_schedule(%{schedule_uuid: schedule_uuid}) do
-    complete_schedule = %{}
-      |> assign(:schedule_uuid, schedule_uuid)
-      |> CompleteSchedule.new()
-
-    with :ok <- Router.dispatch(complete_schedule) do
-      get(Schedule, schedule_uuid)
-    else
-      reply -> reply
-    end
+    %CompleteSchedule{schedule_uuid: schedule_uuid}
+    # with :ok <- Router.dispatch(complete_schedule) do
+    #   get(Schedule, schedule_uuid)
+    # else
+    #   reply -> reply
+    # end
   end
 
   @doc """
@@ -408,11 +405,11 @@ defmodule Inskedular.Scheduling do
   @doc """
   Returns if all matches played by schedule
   """
-  def all_matches_played?(schedule_uuid) do
-    IO.puts "[Scheduling#all_matches_played?] =======> schedule_uuid: #{schedule_uuid}"
+  def matches_count(schedule_uuid) do
+    IO.puts "[Scheduling#matches_count] =======> schedule_uuid: #{schedule_uuid}"
     result = ListMatches.execute(%{schedule_uuid: schedule_uuid}, Repo)
-    |> Enum.all?(fn match -> match.status == "played" end)
-    IO.puts "[Scheduling#all_matches_played?] =======> result for: #{schedule_uuid} : #{result}"
+    |> length
+    IO.puts "[Scheduling#matches_count] =======> result for: #{schedule_uuid} : #{result}"
     result
   end
 

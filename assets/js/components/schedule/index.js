@@ -156,6 +156,7 @@ export default withRouter(observer(class Schedule extends Component {
     const { schedule } = this.props
     const isRunning = schedule.get('status') === 'running'
     const isStopped = schedule.get('status') === 'stopped'
+    const isCompleted = schedule.get('status') === 'completed'
     const pollingAction = isRunning ? 'Stopping' : 'Starting'
     const isEditingDisabled = this.isEditingDisabled()
 
@@ -200,7 +201,7 @@ export default withRouter(observer(class Schedule extends Component {
         &nbsp;
         <span className="actions">
           {
-            !polling && (
+            !polling && !isCompleted && (
               <button onClick={ this.handleUpdateStatus.bind(this) }>
                 { scheduleStatus }
               </button>
@@ -215,7 +216,7 @@ export default withRouter(observer(class Schedule extends Component {
         </span>
         &nbsp;
         {
-          !polling && isRunning &&
+          !polling && (isRunning || isCompleted) &&
             <span>
               <Link to={{ pathname: `/matches/${schedule.id}`, state: { schedule_uuid: schedule.id } }} style={{ marginRight: '5px' }}>Matches</Link>
               <Link to={{ pathname: `/stats/${schedule.id}`, state: { schedule_uuid: schedule.id } }}>Stats</Link>
