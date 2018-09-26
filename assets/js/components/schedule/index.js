@@ -142,6 +142,7 @@ export default withRouter(observer(class Schedule extends Component {
       case 'stopping': return
       case 'inactive': return 'Start'
       case 'stopped': return 'Restart'
+      case 'completed': return
       default: return
     }
   }

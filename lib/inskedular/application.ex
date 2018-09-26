@@ -23,6 +23,7 @@ defmodule Inskedular.Application do
 
       # process managers
       worker(Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager, []),
+      worker(Inskedular.Scheduling.ProcessManagers.MatchProcessManager, []),
 
       # Misc
       worker(Inskedular.Support.Unique, []),

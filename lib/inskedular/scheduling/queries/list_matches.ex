@@ -15,9 +15,9 @@ defmodule Inskedular.Scheduling.Queries.ListMatches do
     options = Options.new(params)
     query = query(options)
 
-    teams = query |> repo.all()
+    matches = query |> repo.all()
 
-    teams
+    matches
   end
 
   defp query(options) do

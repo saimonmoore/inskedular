@@ -12,8 +12,8 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
   ]
 
   alias Inskedular.Scheduling.Aggregates.Schedule
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,IncludeMatchesInSchedule,TerminateSchedule}
-  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,ScheduleRestarted,ScheduleStopped,MatchesCreated,ScheduleTerminated}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,IncludeMatchesInSchedule,TerminateSchedule,CompleteSchedule}
+  alias Inskedular.Scheduling.Events.{ScheduleCreated,ScheduleUpdated,ScheduleDestroyed,ScheduleStarted,ScheduleRestarted,ScheduleStopped,MatchesCreated,ScheduleTerminated,ScheduleCompleted}
 
   @doc """
   Create a new schedule
@@ -136,6 +136,28 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     {:error, :already_terminated}
   end
 
+  @doc """
+  Trigger completion of schedule (Marked as completed)
+  """
+  def execute(%Schedule{status: "running"}, %CompleteSchedule{} = complete) do
+    %ScheduleCompleted{
+      schedule_uuid: complete.schedule_uuid,
+      status: "completed",
+    }
+  end
+
+  def execute(%Schedule{status: "completed"}, %CompleteSchedule{}) do
+    {:error, :already_completed}
+  end
+
+  def execute(%Schedule{status: "terminated"}, %CompleteSchedule{}) do
+    {:error, :already_terminated}
+  end
+
+  def execute(%Schedule{status: "stopped"}, %CompleteSchedule{}) do
+    {:error, :must_be_running}
+  end
+
   # state mutators
 
   def apply(%Schedule{} = schedule, %ScheduleCreated{} = created) do
@@ -201,6 +223,13 @@ defmodule Inskedular.Scheduling.Aggregates.Schedule do
     %Schedule{schedule |
       uuid: terminated.schedule_uuid,
       status: :terminated
+    }
+  end
+
+  def apply(%Schedule{} = schedule, %ScheduleCompleted{} = completed) do
+    %Schedule{schedule |
+      uuid: completed.schedule_uuid,
+      status: :completed
     }
   end
 end

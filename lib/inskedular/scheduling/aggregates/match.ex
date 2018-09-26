@@ -37,6 +37,7 @@ defmodule Inskedular.Scheduling.Aggregates.Match do
   """
   def execute(%Match{}, %UpdateMatch{} = update) do
     %MatchUpdated{
+      schedule_uuid: update.schedule_uuid,
       match_uuid: update.match_uuid,
       status: update.status,
       score_local_team: update.score_local_team,

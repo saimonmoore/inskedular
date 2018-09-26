@@ -15,14 +15,12 @@ defmodule Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager do
   ]
 
   alias Inskedular.Scheduling
-  alias Inskedular.Scheduling.Events.{ScheduleStarted,ScheduleRestarted,ScheduleDestroyed,MatchCreated,MatchesCreated}
+  alias Inskedular.Scheduling.Events.{ScheduleStarted,ScheduleRestarted,ScheduleDestroyed}
   alias Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager
 
   def interested?(%ScheduleStarted{schedule_uuid: schedule_uuid}), do: {:start, schedule_uuid}
   def interested?(%ScheduleRestarted{schedule_uuid: schedule_uuid}), do: {:start, schedule_uuid}
   def interested?(%ScheduleDestroyed{schedule_uuid: schedule_uuid}), do: {:start, schedule_uuid}
-  def interested?(%MatchCreated{schedule_uuid: schedule_uuid}), do: {:continue, schedule_uuid}
-  def interested?(%MatchesCreated{schedule_uuid: schedule_uuid}), do: {:stop, schedule_uuid}
   def interested?(_event), do: false
 
   def handle(%ScheduleProcessManager{}, %ScheduleStarted{schedule_uuid: schedule_uuid}) do
@@ -56,13 +54,6 @@ defmodule Inskedular.Scheduling.ProcessManagers.ScheduleProcessManager do
     IO.puts "[ScheduleProcessManager#apply ScheduleStarted] =======> ...."
     %ScheduleProcessManager{process_manager |
       schedule_uuid: schedule_uuid,
-    }
-  end
-
-  def apply(%ScheduleProcessManager{matches: matches} = process_manager, %MatchCreated{} = match) do
-    IO.puts "[ScheduleProcessManager#apply MatchCreated] =======> ...."
-    %ScheduleProcessManager{process_manager |
-      matches: matches ++ [match]
     }
   end
 end

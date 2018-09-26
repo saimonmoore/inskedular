@@ -7,7 +7,7 @@ defmodule Inskedular.Scheduling do
 
   import Comb
 
-  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,CreateTeam,CreateMatch,DestroyMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam,TerminateSchedule}
+  alias Inskedular.Scheduling.Commands.{CreateSchedule,UpdateSchedule,DestroySchedule,StartSchedule,RestartSchedule,StopSchedule,CreateTeam,CreateMatch,DestroyMatch,IncludeMatchesInSchedule,UpdateMatch,UpdateTeam,DestroyTeam,TerminateSchedule,CompleteSchedule}
   alias Inskedular.Scheduling.Projections.{Schedule,Team,Match}
   alias Inskedular.Scheduling.Queries.{ScheduleByName,ListSchedules,TeamByName,ListTeams,ListMatches,MatchesByScheduleUuid,TeamsByScheduleUuid}
   alias Inskedular.{Repo,Router}
@@ -53,6 +53,21 @@ defmodule Inskedular.Scheduling do
       |> TerminateSchedule.new()
 
     with :ok <- Router.dispatch(terminate_schedule) do
+      get(Schedule, schedule_uuid)
+    else
+      reply -> reply
+    end
+  end
+
+  @doc """
+  Update a Schedule's status as completed
+  """
+  def complete_schedule(%{schedule_uuid: schedule_uuid}) do
+    complete_schedule = %{}
+      |> assign(:schedule_uuid, schedule_uuid)
+      |> CompleteSchedule.new()
+
+    with :ok <- Router.dispatch(complete_schedule) do
       get(Schedule, schedule_uuid)
     else
       reply -> reply
@@ -391,12 +406,24 @@ defmodule Inskedular.Scheduling do
   end
 
   @doc """
+  Returns if all matches played by schedule
+  """
+  def all_matches_played?(schedule_uuid) do
+    IO.puts "[Scheduling#all_matches_played?] =======> schedule_uuid: #{schedule_uuid}"
+    result = ListMatches.execute(%{schedule_uuid: schedule_uuid}, Repo)
+    |> Enum.all?(fn match -> match.status == "played" end)
+    IO.puts "[Scheduling#all_matches_played?] =======> result for: #{schedule_uuid} : #{result}"
+    result
+  end
+
+  @doc """
   Update a Match
   """
-  def update_match(%{"id" => uuid} = attrs \\ %{}) do
+  def update_match(%{"id" => uuid, "schedule_uuid" => schedule_uuid} = attrs \\ %{}) do
     update_match = 
       attrs
       |> assign(:match_uuid, uuid)
+      |> assign(:schedule_uuid, schedule_uuid)
       |> Map.delete("id")
       |> cast_match_attributes
       |> UpdateMatch.new

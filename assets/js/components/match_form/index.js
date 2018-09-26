@@ -104,6 +104,7 @@ export default observer(class Match extends Component {
 
   updateMatch() {
     const { match } = this.props
+    const schedule_uuid = match.get("schedule_uuid")
     const status = 'played'
     const {
       result,
@@ -112,6 +113,7 @@ export default observer(class Match extends Component {
     } = this.state.form
 
     const promise = match.save({
+      schedule_uuid,
       result,
       score_local_team,
       score_away_team,
