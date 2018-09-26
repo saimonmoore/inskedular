@@ -408,15 +408,20 @@ defmodule Inskedular.Scheduling do
     end
   end
 
-  defp cast_match_attributes(%{
-    "score_local_team" => score_local_team,
-    "score_away_team" => score_away_team,
-  } = attrs) do
+  defp cast_match_attributes(attrs) do
+    score_local_team = attrs["score_local_team"]
+    score_away_team = attrs["score_away_team"]
+    scores = [score_local_team, score_away_team]
 
-    %{attrs |
-      "score_local_team" => String.to_integer(score_local_team),
-      "score_away_team" => String.to_integer(score_away_team),
-    }
+    case Enum.any?(scores) do
+      true ->
+        %{
+          attrs |
+          "score_local_team" => String.to_integer(score_local_team || "0"),
+          "score_away_team" => String.to_integer(score_away_team || "0"),
+        }
+      _ -> Map.drop(attrs, ["score_local_team", "score_away_team"])
+    end
   end
 
   ############

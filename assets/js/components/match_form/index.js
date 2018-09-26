@@ -43,8 +43,8 @@ export default observer(class Match extends Component {
       form: {},
       submitting: false,
       result: '',
-      score_local_team: 0,
-      score_away_team: 0,
+      score_local_team: null,
+      score_away_team: null,
       showScores: false,
     }
 
