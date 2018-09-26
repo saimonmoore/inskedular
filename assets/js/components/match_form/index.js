@@ -4,6 +4,37 @@ import ReactModal from 'react-modal'
 
 ReactModal.setAppElement('#page-wrapper')
 
+const styles = {
+  fields: {
+    display: 'flex',
+    flexDirection: 'column',
+    select: {
+      cursor: 'pointer',
+    }
+  },
+  score: {
+    display: 'flex',
+  },
+  labels: {
+    marginLeft: '5px',
+    marginRight: '5px',
+  },
+  buttons: {
+    display: 'flex',
+    marginRight: '10px',
+    marginTop: '45px',
+  },
+  modal: {
+    content: {
+      maxHeight: '500px',
+      maxWidth: '500px',
+      left: '550px',
+    }
+  },
+  toggleScores: {
+    cursor: 'pointer'
+  }
+}
 export default observer(class Match extends Component {
   constructor(props) {
     super(props)
@@ -14,12 +45,20 @@ export default observer(class Match extends Component {
       result: '',
       score_local_team: 0,
       score_away_team: 0,
+      showScores: false,
     }
 
     this.handleOpenModal = this.handleOpenModal.bind(this)
     this.handleCloseModal = this.handleCloseModal.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
+    this.toggleScores = this.toggleScores.bind(this)
+  }
+
+  toggleScores() {
+    const { showScores: oldShowScores } = this.state
+
+    this.setState({ showScores: !oldShowScores })
   }
 
   handleOpenModal() {
@@ -88,6 +127,7 @@ export default observer(class Match extends Component {
   }
 
   render() {
+    const { showScores } = this.state
     const { localTeam, awayTeam, match } = this.props
     const played = match.get('status') === 'played'
     const submitLabel = match.isRequest('saving') ? 'Saving' : 'Submit'
@@ -100,43 +140,55 @@ export default observer(class Match extends Component {
         }
         <ReactModal
            isOpen={ this.state.showModal }
-           contentLabel="onRequestClose Example"
+           contentLabel="Mark As Played"
            onRequestClose={ this.handleCloseModal }
            shouldCloseOnOverlayClick={ false }
+           style={styles.modal}
         >
           <form onSubmit={ this.handleSubmit }>
-            <label>
-              Result:
-              <select
-                id='match_result'
-                name='result'
-                value={ this.state.result }
-                onChange={ this.handleInputChange } >
-                <option value={ localTeam.id }>Win for { localTeam.get('name') }</option>
-                <option value={ awayTeam.id }>Win for { awayTeam.get('name') }</option>
-                <option value="draw">Draw</option>
-              </select>
-            </label>
-            <label>
-              { localTeam.get('name') }'s score:
-              <input
-                id='match_score_local_team'
-                name='score_local_team'
-                type="text"
-                value={ this.state.score_local_team }
-                onChange={ this.handleInputChange } />
-            </label>
-            <label>
-              { awayTeam.get('name') }'s score:
-              <input
-                id='match_score_away_team'
-                name='score_away_team'
-                type="text"
-                value={ this.state.score_away_team }
-                onChange={ this.handleInputChange } />
-            </label>
-            <input type="submit" disabled={ submitDisabled } value={ submitLabel } />
-            <input type="submit" onClick={ this.handleCloseModal } value='Cancel' style={{marginLeft: '2em'}}/>
+            <div style={styles.fields}>
+              <label style={styles.labels}>
+                Result:
+                <select
+                  id='match_result'
+                  name='result'
+                  value={ this.state.result }
+                  onChange={ this.handleInputChange } >
+                  <option value="draw">Draw</option>
+                  <option value={ localTeam.id }>Win for { localTeam.get('name') }</option>
+                  <option value={ awayTeam.id }>Win for { awayTeam.get('name') }</option>
+                </select>
+              </label>
+              <span onClick={this.toggleScores} style={styles.toggleScores}>{ showScores ? "Hide Scores" : "Add Scores" }</span>
+              {
+                showScores && (
+                  <div style={styles.score}>
+                    <label style={styles.labels}>
+                      { localTeam.get('name') }'s score:
+                      <input
+                        id='match_score_local_team'
+                        name='score_local_team'
+                        type="text"
+                        value={ this.state.score_local_team }
+                        onChange={ this.handleInputChange } />
+                    </label>
+                    <label style={styles.labels}>
+                      { awayTeam.get('name') }'s score:
+                      <input
+                        id='match_score_away_team'
+                        name='score_away_team'
+                        type="text"
+                        value={ this.state.score_away_team }
+                        onChange={ this.handleInputChange } />
+                    </label>
+                  </div>
+                )
+              }
+            </div>
+            <div style={styles.buttons}>
+              <input type="submit" disabled={ submitDisabled } value={ submitLabel } />
+              <input type="submit" onClick={ this.handleCloseModal } value='Cancel' style={{marginLeft: '2em'}}/>
+            </div>
           </form>
         </ReactModal>
       </span>
